@@ -1,20 +1,25 @@
 use image::{DynamicImage, GenericImageView};
 use pixel_canvas::{input::MouseState, Canvas, Color};
 
+const W: usize = 1000;
+const H: usize = 572;
+const RADIUS: f64 = 150.;
+
+// Test image from https://stock.adobe.com/
 fn main() {
-    let data = include_bytes!("../assets/test.jpeg");
+    let data = include_bytes!("../assets/test.jpg");
     let bg = image::load_from_memory(data).unwrap();
-    let canvas = Canvas::new(500, 500)
+    let canvas = Canvas::new(W, H)
         .title("Magnifying Glass")
         .state(MouseState::new())
         .input(MouseState::handle_input);
     canvas.render(move |mouse, image| {
-        let width = image.width();
-        let height = image.height();
-        for (y, row) in image.chunks_mut(width).enumerate() {
+        let width = image.width() as u32;
+        let height = image.height() as u32;
+        for (y, row) in image.chunks_mut(width as usize).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
                 let distance = distance(mouse, x, y);
-                let [x, y] = if distance > 75. {
+                let [x, y] = if distance > RADIUS {
                     [x as i32, y as i32]
                 } else {
                     let (dx, dy) = project(
@@ -24,7 +29,7 @@ fn main() {
                     );
                     [x as i32 + dx, y as i32 + dy]
                 };
-                *pixel = sample(&bg, width as u32, height as u32, x as u32, y as u32);
+                *pixel = sample(&bg, width, height, x as u32, y as u32);
             }
         }
     });
@@ -52,7 +57,7 @@ fn sample(bg: &DynamicImage, width: u32, height: u32, x: u32, y: u32) -> Color {
 }
 
 fn project(dx: f64, dy: f64, distance: f64) -> (i32, i32) {
-    let d_norm = distance / 75.0;
+    let d_norm = distance / RADIUS;
     let g = (-0.5 + d_norm).tan();
     let dx = dx * g;
     let dy = dy * g;
