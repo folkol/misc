@@ -1,0 +1,8 @@
+[package]
+name = "magnifying-glass"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pixel-canvas = "0.2.3"
+image = "0.24.6"
