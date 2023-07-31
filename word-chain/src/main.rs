@@ -14,16 +14,12 @@ fn main() {
 
     let from = args().nth(1).expect("Expected from");
     let to = args().nth(2).expect("Expected to");
-    println!("{from} {to}");
 
-    let mut start_queue: VecDeque<String> = VecDeque::new();
-    start_queue.push_back(from.clone());
-    let mut end_queue: VecDeque<String> = VecDeque::new();
-    end_queue.push_back(to.clone());
-    let mut seen_from_start: HashMap<String, String> = HashMap::new();
-    seen_from_start.insert(from.clone(), "".to_owned());
-    let mut seen_from_end: HashMap<String, String> = HashMap::new();
-    seen_from_end.insert(to.clone(), "".to_owned());
+    let mut start_queue: VecDeque<String> = VecDeque::from([from.clone()]);
+    let mut end_queue: VecDeque<String> = VecDeque::from([to.clone()]);
+    let mut seen_from_start: HashMap<String, String> =
+        HashMap::from([(from.clone(), "".to_owned())]);
+    let mut seen_from_end: HashMap<String, String> = HashMap::from([(to.clone(), "".to_owned())]);
 
     while !start_queue.is_empty() || !end_queue.is_empty() {
         // println!("queue sizes: {}, {}", start_queue.len(), end_queue.len());
@@ -34,11 +30,7 @@ fn main() {
             &mut seen_from_end,
             &from,
             &to,
-        ) {
-            println!("found path");
-            break;
-        }
-        if do_step(
+        ) || do_step(
             &dictionary,
             &mut end_queue,
             &mut seen_from_end,
@@ -46,7 +38,6 @@ fn main() {
             &to,
             &from,
         ) {
-            println!("found path");
             break;
         }
     }
@@ -65,7 +56,7 @@ fn do_step(
 ) -> bool {
     if let Some(node) = my_queue.pop_front() {
         if their_seen.contains_key(&node) {
-            println!("Found path, reconstructing");
+            // Found path, reconstructing
             let mut path: Vec<String> = Vec::new();
             path.insert(0, node.clone());
             let mut parent = my_seen.get(&node).unwrap().to_owned();
@@ -90,8 +81,7 @@ fn do_step(
                 }
                 parent = their_seen.get(&parent).unwrap().to_owned();
             }
-            println!("path: {path:?}");
-
+            println!("{}", path.join(" -> "));
             return true;
         }
 
