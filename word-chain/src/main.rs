@@ -108,9 +108,7 @@ fn reconstruct_path(
             break;
         }
         path.insert(0, parent.to_owned());
-        if
-        /**/
-        &parent == from {
+        if &parent == from {
             break;
         }
         parent = my_seen.get(&parent).unwrap().to_owned();
