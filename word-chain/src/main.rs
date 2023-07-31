@@ -21,20 +21,20 @@ fn main() {
         HashMap::from([(from.clone(), "".to_owned())]);
     let mut seen_from_end: HashMap<String, String> = HashMap::from([(to.clone(), "".to_owned())]);
 
+    // BFS from each end, stop when we find a common word
     while !start_queue.is_empty() || !end_queue.is_empty() {
-        // println!("queue sizes: {}, {}", start_queue.len(), end_queue.len());
         if do_step(
             &dictionary,
             &mut start_queue,
             &mut seen_from_start,
-            &mut seen_from_end,
+            &seen_from_end,
             &from,
             &to,
         ) || do_step(
             &dictionary,
             &mut end_queue,
             &mut seen_from_end,
-            &mut seen_from_start,
+            &seen_from_start,
             &to,
             &from,
         ) {
@@ -42,7 +42,7 @@ fn main() {
         }
     }
     if start_queue.is_empty() && end_queue.is_empty() {
-        println!("Couldn't find a path");
+        println!("Couldn't find a path :(");
     }
 }
 
@@ -50,37 +50,14 @@ fn do_step(
     dictionary: &Vec<String>,
     my_queue: &mut VecDeque<String>,
     my_seen: &mut HashMap<String, String>,
-    their_seen: &mut HashMap<String, String>,
+    their_seen: &HashMap<String, String>,
     from: &String,
     to: &String,
 ) -> bool {
     if let Some(node) = my_queue.pop_front() {
         if their_seen.contains_key(&node) {
             // Found path, reconstructing
-            let mut path: Vec<String> = Vec::new();
-            path.insert(0, node.clone());
-            let mut parent = my_seen.get(&node).unwrap().to_owned();
-            loop {
-                if &parent == "" {
-                    break;
-                }
-                path.insert(0, parent.to_owned());
-                if &parent == from {
-                    break;
-                }
-                parent = my_seen.get(&parent).unwrap().to_owned();
-            }
-            let mut parent = their_seen.get(&node).unwrap().to_owned();
-            loop {
-                if &parent == "" {
-                    break;
-                }
-                path.push(parent.to_owned());
-                if &parent == to {
-                    break;
-                }
-                parent = their_seen.get(&parent).unwrap().to_owned();
-            }
+            let path = reconstruct_path(my_seen, their_seen, from, to, &node);
             println!("{}", path.join(" -> "));
             return true;
         }
@@ -113,4 +90,42 @@ fn do_step(
         }
     }
     false
+}
+
+fn reconstruct_path(
+    my_seen: &HashMap<String, String>,
+    their_seen: &HashMap<String, String>,
+    from: &String,
+    to: &String,
+    node: &String,
+) -> Vec<String> {
+    let mut path: Vec<String> = Vec::new();
+    path.insert(0, node.clone());
+    // my parents
+    let mut parent = my_seen.get(node).unwrap().to_owned();
+    loop {
+        if parent.is_empty() {
+            break;
+        }
+        path.insert(0, parent.to_owned());
+        if
+        /**/
+        &parent == from {
+            break;
+        }
+        parent = my_seen.get(&parent).unwrap().to_owned();
+    }
+    // their parents
+    let mut parent = their_seen.get(node).unwrap().to_owned();
+    loop {
+        if parent.is_empty() {
+            break;
+        }
+        path.push(parent.to_owned());
+        if &parent == to {
+            break;
+        }
+        parent = their_seen.get(&parent).unwrap().to_owned();
+    }
+    path
 }
