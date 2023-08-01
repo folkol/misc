@@ -1,11 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
-    "pulsating-heart"
+    "pulsating-heart",
+    "snake"
 ]
-
-[profile.dev]
-opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
