@@ -20,7 +20,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .insert_resource(State {
             num_particles: 0,
-            max_particles: 1000,
+            max_particles: 1_000_000,
         })
         .add_systems(Startup, startup)
         .add_systems(
@@ -58,7 +58,6 @@ fn kill_particles(
 ) {
     for (entity, particle_state) in &mut particles {
         if particle_state.ttl.finished() {
-            println!("Particle dead");
             commands.entity(entity).despawn();
             state.num_particles -= 1;
         }
@@ -68,7 +67,6 @@ fn kill_particles(
 fn spawn_particles(mut commands: Commands, mut state: ResMut<State>) {
     let mut rng = rand::thread_rng();
     if state.num_particles < state.max_particles {
-        println!("Spawn new");
         state.num_particles += 1;
         commands.spawn((
             SpriteBundle {
@@ -93,7 +91,7 @@ fn spawn_particles(mut commands: Commands, mut state: ResMut<State>) {
                     x: rng.gen_range(-10..10) as f32,
                     y: rng.gen_range(50..100) as f32,
                 },
-                ttl: Timer::from_seconds(10., TimerMode::Once),
+                ttl: Timer::from_seconds(20., TimerMode::Once),
             },
         ));
     }
