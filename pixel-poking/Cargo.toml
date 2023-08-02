@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = [
+    "bouncing-pixel",
+    "mini_gl_fb-random-walk-still-image",
+    "mini_gl_fb-animation",
+    "mandelbrot",
+]
+
+[profile.dev.package."*"]
+opt-level = 3
