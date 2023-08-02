@@ -30,7 +30,7 @@ fn setup(
 
     commands.spawn(MaterialMesh2dBundle {
         mesh: meshes
-            .add(shape::Quad::new(Vec2::new(-250., 250.)).into())
+            .add(shape::Quad::new(Vec2::new(-500., 500.)).into())
             .into(),
         material: materials.add(MyMaterial {}),
         ..default()
