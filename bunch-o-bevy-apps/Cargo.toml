@@ -2,7 +2,8 @@
 resolver = "2"
 members = [
     "pulsating-heart",
-    "snake"
+    "snake",
+    "particle-system"
 ]
 
 [profile.dev.package."*"]

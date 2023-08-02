@@ -65,6 +65,8 @@ fn main() {
             primary_window: Some(Window {
                 resolution: (500., 500.).into(),
                 title: "Snake".to_owned(),
+                resizable: false,
+                decorations: false,
                 ..default()
             }),
             exit_condition: ExitCondition::OnAllClosed,
@@ -123,25 +125,31 @@ fn update(
     }
     let (mut snake_pos, mut tail) = snake.single_mut();
     let prev_head_pos = snake_pos.translation.clone();
-    match game_state.direction {
-        Direction::Up => {
-            snake_pos.translation.y += 10.;
-        }
-        Direction::Right => {
-            snake_pos.translation.x += 10.;
-        }
-        Direction::Down => {
-            snake_pos.translation.y -= 10.;
-        }
-        Direction::Left => {
-            snake_pos.translation.x -= 10.;
-        }
-    }
-    let Vec3 { x, y, z } = snake_pos.translation;
+    let next_pos = match game_state.direction {
+        Direction::Up => Vec3 {
+            y: snake_pos.translation.y + 10.,
+            ..snake_pos.translation
+        },
+        Direction::Right => Vec3 {
+            x: snake_pos.translation.x + 10.,
+            ..snake_pos.translation
+        },
+        Direction::Down => Vec3 {
+            y: snake_pos.translation.y - 10.,
+            ..snake_pos.translation
+        },
+        Direction::Left => Vec3 {
+            x: snake_pos.translation.x - 10.,
+            ..snake_pos.translation
+        },
+    };
+
+    let Vec3 { x, y, z } = next_pos.clone();
     if x < -250. || x > 250. || y < -250. || y > 250. || tail.segments.contains(&Vec3 { x, y, z }) {
-        println!("DED AT {x} {y} {z}");
         game_state.alive = false;
+        return;
     }
+    snake_pos.translation = next_pos;
     tail.segments.insert(0, prev_head_pos);
     tail.segments.pop().unwrap();
 
