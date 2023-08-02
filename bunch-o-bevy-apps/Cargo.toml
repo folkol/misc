@@ -3,7 +3,8 @@ resolver = "2"
 members = [
     "pulsating-heart",
     "snake",
-    "particle-system"
+    "particle-system",
+    "animated-shader"
 ]
 
 [profile.dev.package."*"]

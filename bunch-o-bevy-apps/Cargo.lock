@@ -186,6 +186,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "animated-shader"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
