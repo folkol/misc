@@ -8,6 +8,7 @@ members = [
     "metaballs",
     "rainbow",
     "raycaster",
+    "ripples",
 ]
 
 [profile.dev.package."*"]
