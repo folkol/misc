@@ -5,6 +5,7 @@ members = [
     "mini_gl_fb-random-walk-still-image",
     "mini_gl_fb-animation",
     "mandelbrot",
+    "metaballs",
 ]
 
 [profile.dev.package."*"]
