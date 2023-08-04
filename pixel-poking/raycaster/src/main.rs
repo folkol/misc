@@ -62,64 +62,76 @@ fn main() {
             y -= dy / 20.;
         }
 
-        let mut scene = [0.; NUM_SLICES];
-        let start = angle - PI / 8.;
-        let step = (PI / 4.) / NUM_SLICES as f32;
-        for slice in 0..NUM_SLICES {
-            let cur_angle = start + slice as f32 * step;
-            let dx = cur_angle.cos() / 100.;
-            let dy = cur_angle.sin() / 100.;
-            let mut ray_x = x;
-            let mut ray_y = y;
-            let distance = loop {
-                let sample_x = ray_x.round() as isize;
-                let sample_y = ray_y.round() as isize;
-
-                if sample_x < 0
-                    || sample_x >= 10
-                    || sample_y < 0
-                    || sample_y >= 10
-                    || WORLD[sample_y as usize][sample_x as usize] == 1
-                {
-                    break (ray_x - x).powf(2.) + (ray_y - y).powf(2.);
-                }
-                ray_x += dx;
-                ray_y += dy;
-            };
-            scene[slice] = distance;
-        }
-        let step_size = WIDTH / NUM_SLICES;
-        buffer.iter_mut().for_each(|x| *x = 0);
         let elapsed = begin.elapsed().unwrap().as_secs_f32();
         let bob = if is_running {
             (elapsed * 20.).sin() * HEIGHT as f32 / 100.
         } else {
             0.
         };
+        let scene = cast_rays(x, y, angle);
+        let step_size = WIDTH / NUM_SLICES;
+        buffer.iter_mut().for_each(|x| *x = 0);
         for row in 0..NUM_SLICES - 1 {
-            let distance_left = scene[row];
-            let distance_right = scene[row + 1];
-            let height_left = (HEIGHT / 2) as f32 / distance_left;
-            let height_right = (HEIGHT / 2) as f32 / distance_right;
-
-            println!("{height_left} -> {height_right}");
-
             let left = row * step_size;
             let right = (row + 1) * step_size;
-            for col in left..right {
-                let height = height_left
-                    + ((col - left) as f32 / step_size as f32) * (height_right - height_left);
-                let top = (HEIGHT as f32 / 2. - height + bob).clamp(0., HEIGHT as f32) as usize;
-                let bottom = (HEIGHT as f32 / 2. + height + bob).clamp(0., HEIGHT as f32) as usize;
-                let distance = distance_left + (distance_right - distance_left) / step_size as f32;
-
-                for line in top..bottom {
-                    let i = line * WIDTH + col;
-                    let c = 20 + (235. / distance) as u32;
-                    buffer[i] = c << 16 | c << 8 | c;
-                }
-            }
+            draw_quad(&mut buffer, bob, scene[row], scene[row + 1], left, right);
         }
         window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
+    }
+}
+
+fn cast_rays(x: f32, y: f32, angle: f32) -> [f32; 10] {
+    let mut scene = [0.; NUM_SLICES];
+    let start = angle - PI / 8.;
+    let step = (PI / 4.) / NUM_SLICES as f32;
+    for slice in 0..NUM_SLICES {
+        let cur_angle = start + slice as f32 * step;
+        let dx = cur_angle.cos() / 100.;
+        let dy = cur_angle.sin() / 100.;
+        let mut ray_x = x;
+        let mut ray_y = y;
+        let distance = loop {
+            let sample_x = ray_x.round() as isize;
+            let sample_y = ray_y.round() as isize;
+
+            if sample_x < 0
+                || sample_x >= 10
+                || sample_y < 0
+                || sample_y >= 10
+                || WORLD[sample_y as usize][sample_x as usize] == 1
+            {
+                break (ray_x - x).powf(2.) + (ray_y - y).powf(2.);
+            }
+            ray_x += dx;
+            ray_y += dy;
+        };
+        scene[slice] = distance;
+    }
+    scene
+}
+
+fn draw_quad(
+    buffer: &mut Vec<u32>,
+    bob: f32,
+    distance_left: f32,
+    distance_right: f32,
+    left: usize,
+    right: usize,
+) {
+    let height_left = (HEIGHT / 2) as f32 / distance_left;
+    let height_right = (HEIGHT / 2) as f32 / distance_right;
+    let step_size = right - left;
+    for col in left..right {
+        let height =
+            height_left + ((col - left) as f32 / step_size as f32) * (height_right - height_left);
+        let top = (HEIGHT as f32 / 2. - height + bob).clamp(0., HEIGHT as f32) as usize;
+        let bottom = (HEIGHT as f32 / 2. + height + bob).clamp(0., HEIGHT as f32) as usize;
+        let distance = distance_left + (distance_right - distance_left) / step_size as f32;
+
+        for line in top..bottom {
+            let i = line * WIDTH + col;
+            let c = 20 + (235. / distance) as u32;
+            buffer[i] = c << 16 | c << 8 | c;
+        }
     }
 }
