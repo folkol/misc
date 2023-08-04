@@ -6,6 +6,7 @@ members = [
     "mini_gl_fb-animation",
     "mandelbrot",
     "metaballs",
+    "rainbow",
 ]
 
 [profile.dev.package."*"]

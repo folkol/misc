@@ -39,12 +39,12 @@ fn main() {
             x: WIDTH as f32 / 2.0,
             y: HEIGHT as f32 / 2.0,
             dx: BALL_SPEED,
-            dy: -BALL_SPEED  /2.0,
+            dy: -BALL_SPEED / 2.0,
         },
         Ball {
             x: WIDTH as f32 / 2.0,
             y: HEIGHT as f32 / 2.0,
-            dx: -BALL_SPEED  / 3.0,
+            dx: -BALL_SPEED / 3.0,
             dy: BALL_SPEED,
         },
         Ball {
