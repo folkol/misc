@@ -4,7 +4,8 @@ members = [
     "pulsating-heart",
     "snake",
     "particle-system",
-    "animated-shader"
+    "animated-shader",
+    "breakthrough",
 ]
 
 [profile.dev.package."*"]
