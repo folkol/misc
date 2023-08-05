@@ -1,7 +1,8 @@
 # Speed comparisons for various 'filter' implementations
 
 The filter should read lines from stdin, print them back to stdout -- and end
-with the sum of all line lengths.
+with the sum of all line lengths. Cound (ascii) characers, not 'grapheme
+clusters'.
 
 ## input.txt
 
@@ -17,7 +18,7 @@ with the sum of all line lengths.
 
 ## Results (best-of-three, wall-clock)
 
-|a.pl|0.54|
+|a.pl|0.54|byte-fiddling, not interpreting unicode
 |a.py|1.23|
 |a.rs|3.72|
 |b.rs|0.56|buffered output
