@@ -1,0 +1,4 @@
+# Speed comparisons for various 'filter' implementations
+
+The filter should read lines from stdin, print them back to stdout -- and end
+with the sum of all line lengths.
