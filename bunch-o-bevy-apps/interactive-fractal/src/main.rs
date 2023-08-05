@@ -56,6 +56,7 @@ fn update(
     }
 
     let quad = query.single_mut();
+    // TODO: surely there is a better way to update attributes per-frame?
     commands.entity(quad).despawn();
     commands.spawn(MaterialMesh2dBundle {
         mesh: meshes
