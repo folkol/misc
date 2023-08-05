@@ -1,4 +1,3 @@
-use bevy::audio::AudioPlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypePath;
 use bevy_rapier2d::prelude::*;
