@@ -1891,6 +1891,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "interactive-fractal"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "io-kit-sys"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -6,6 +6,7 @@ members = [
     "particle-system",
     "animated-shader",
     "breakthrough",
+    "interactive-fractal",
 ]
 
 [profile.dev.package."*"]
