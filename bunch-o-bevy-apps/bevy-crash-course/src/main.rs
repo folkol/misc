@@ -36,17 +36,48 @@ enum Action {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
+    spawn_player(&mut commands, &asset_server, 0);
+    spawn_player(&mut commands, &asset_server, 1);
+    commands
+        .spawn(SpriteBundle {
+            transform: Transform::from_xyz(150.0, 200.0, 0.0),
+            texture: asset_server.load("block_corner.png"),
+            ..default()
+        })
+        .insert(Collider::triangle(
+            Vec2::new(-32.0, 32.0),
+            Vec2::new(32.0, -32.0),
+            Vec2::new(-32.0, -32.0),
+        ))
+        .insert(RigidBody::Fixed)
+        .insert(Restitution::coefficient(3.0));
+}
+
+fn spawn_player(commands: &mut Commands, asset_server: &Res<AssetServer>, id: usize) {
+    let x = if id == 0 {
+        "ball_blue_large.png"
+    } else {
+        "ball_red_large.png"
+    };
     commands
         .spawn(SpriteBundle {
             transform: Transform::from_translation(Vec3::new(-150.0, 0.0, 1.0)),
-            texture: asset_server.load("ball_blue_large.png"),
+            texture: asset_server.load(x),
             ..default()
         })
         .insert(InputManagerBundle::<Action> {
             action_state: ActionState::default(),
             // input_map: InputMap::new([(KeyCode::Left, Action::Move)]),
             input_map: InputMap::default()
-                .insert(VirtualDPad::arrow_keys(), Action::Move)
+                .insert(
+                    if id == 0 {
+                        VirtualDPad::arrow_keys()
+                    } else {
+                        VirtualDPad::wasd()
+                    },
+                    Action::Move,
+                )
+                .set_gamepad(Gamepad { id })
                 .build(),
         })
         .insert(Player)
@@ -61,19 +92,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             angular_damping: 5.0,
         })
         .insert(Restitution::coefficient(1.0));
-    commands
-        .spawn(SpriteBundle {
-            transform: Transform::from_xyz(150.0, 200.0, 0.0),
-            texture: asset_server.load("block_corner.png"),
-            ..default()
-        })
-        .insert(Collider::triangle(
-            Vec2::new(-32.0, 32.0),
-            Vec2::new(32.0, -32.0),
-            Vec2::new(-32.0, -32.0),
-        ))
-        .insert(RigidBody::Fixed)
-        .insert(Restitution::coefficient(3.0));
 }
 
 const MOVE_FORCE: f32 = 1500.0;
