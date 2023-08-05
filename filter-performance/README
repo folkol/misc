@@ -16,7 +16,11 @@ clusters'.
 - 'a' should be naive straight-forward implementation
 - 'b+' can be alternative / more sofisticated things
 
-## Results (best-of-three, wall-clock)
+## Results
+
+- best-of-three
+- wall-clock
+- MacBook Pro (late 2013)
 
 |a.pl|0.54|byte-fiddling, not interpreting unicode
 |a.py|1.23|
