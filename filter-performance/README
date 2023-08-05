@@ -14,3 +14,11 @@ with the sum of all line lengths.
 
 - 'a' should be naive straight-forward implementation
 - 'b+' can be alternative / more sofisticated things
+
+## Results (best-of-three, wall-clock)
+
+|a.pl|0.54|
+|a.py|1.23|
+|a.rs|3.72|
+|b.rs|0.56|buffered output
+|c.rs|0.47|buffered output + reuse String for input
