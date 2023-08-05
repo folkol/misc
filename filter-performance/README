@@ -2,3 +2,15 @@
 
 The filter should read lines from stdin, print them back to stdout -- and end
 with the sum of all line lengths.
+
+## input.txt
+
+- lines are between 0 and 500 chars long
+- all lines end with unicode
+- there are one million lines
+- there are no 'tricky' lines
+
+## variations
+
+- 'a' should be naive straight-forward implementation
+- 'b+' can be alternative / more sofisticated things
