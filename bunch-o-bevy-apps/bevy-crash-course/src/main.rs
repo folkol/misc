@@ -1,3 +1,4 @@
+use bevy::audio::AudioPlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypePath;
 use bevy_rapier2d::prelude::*;
@@ -16,13 +17,14 @@ fn main() {
             InputManagerPlugin::<Action>::default(),
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(200.0),
             RapierDebugRenderPlugin::default(), // debug wireframes
+                                                // AudioPlugin::default(),
         ))
         .insert_resource(RapierConfiguration {
             gravity: Vec2::ZERO,
             ..default()
         })
         .add_systems(Startup, setup)
-        .add_systems(Update, movement)
+        .add_systems(Update, (movement, collusion_sounds))
         .run();
 }
 
@@ -103,5 +105,28 @@ fn movement(
     for (action_state, mut external_force) in &mut query {
         let axis_vector = action_state.clamped_axis_pair(Action::Move).unwrap().xy();
         external_force.force = axis_vector * MOVE_FORCE * time.delta_seconds();
+    }
+}
+
+fn collusion_sounds(
+    rapier_context: Res<RapierContext>,
+    // audio: Res<Audio>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let mut just_collided = false;
+    for pair in rapier_context.contact_pairs() {
+        if pair.has_any_active_contacts() {
+            just_collided = true
+        }
+    }
+    if just_collided {
+        let sound: Handle<AudioSource> = asset_server.load("impactGlass_heavy_002.ogg");
+        commands.spawn(AudioBundle {
+            source: sound,
+            settings: PlaybackSettings::DESPAWN,
+        });
+
+        // audio.play(sound);
     }
 }
