@@ -1,9 +1,7 @@
 use bevy::prelude::*;
 use bevy::reflect::TypePath;
-use bevy_rapier2d::na::ComplexField;
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::*;
-use leafwing_input_manager::user_input::InputKind::DualAxis;
 
 fn main() {
     App::new()
@@ -49,11 +47,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // input_map: InputMap::new([(KeyCode::Left, Action::Move)]),
             input_map: InputMap::default()
                 .insert(VirtualDPad::arrow_keys(), Action::Move)
-                // .insert(DualAxis::)
-                // .insert(KeyCode::Left, Action::Move)
-                // .insert(KeyCode::Right, Action::Move)
-                // .insert(KeyCode::Up, Action::Move)
-                // .insert(KeyCode::Down, Action::Move)
                 .build(),
         })
         .insert(Player)
@@ -68,6 +61,19 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             angular_damping: 5.0,
         })
         .insert(Restitution::coefficient(1.0));
+    commands
+        .spawn(SpriteBundle {
+            transform: Transform::from_xyz(150.0, 200.0, 0.0),
+            texture: asset_server.load("block_corner.png"),
+            ..default()
+        })
+        .insert(Collider::triangle(
+            Vec2::new(-32.0, 32.0),
+            Vec2::new(32.0, -32.0),
+            Vec2::new(-32.0, -32.0),
+        ))
+        .insert(RigidBody::Fixed)
+        .insert(Restitution::coefficient(3.0));
 }
 
 const MOVE_FORCE: f32 = 1500.0;
@@ -77,10 +83,7 @@ fn movement(
     time: Res<Time>,
 ) {
     for (action_state, mut external_force) in &mut query {
-        // xy for joystick, how for keyboard?
         let axis_vector = action_state.clamped_axis_pair(Action::Move).unwrap().xy();
-        // let axis_vector = action_state.axis_pair()
-        println!("axis_vector: {axis_vector}");
         external_force.force = axis_vector * MOVE_FORCE * time.delta_seconds();
     }
 }
