@@ -115,10 +115,15 @@ fn animate_sprite(
 
 const SPEED: f32 = 200.0;
 
-fn move_bullets(mut commands: Commands, mut query: Query<(Entity, &mut Transform, &Bullet)>) {
+fn move_bullets(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Transform, &Bullet)>,
+    time: Res<Time>,
+) {
     for (entity, mut transform, bullet) in query.iter_mut() {
         transform.translation.x += bullet.0.x;
         transform.translation.y += bullet.0.y;
+        transform.rotation = Quat::from_rotation_z(time.elapsed_seconds() * 10.0);
         if transform.translation.distance(Vec3::ZERO) > 500.0 {
             commands.entity(entity).despawn()
         }
@@ -147,14 +152,15 @@ fn shoot(
                 sprite: TextureAtlasSprite::new(animation_indices.first),
                 transform: Transform {
                     translation: zombie.translation,
-                    rotation: Quat::from_rotation_x(1.0),
-                    scale: Vec3::new(0.1, 0.1, 1.0),
+                    // rotation: Quat::from_rotation_x(1.0),
+                    scale: Vec3::new(0.3, 0.3, 1.0),
+                    ..default()
                 },
                 ..default()
             },
             animation_indices,
             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-            Bullet((cursor.translation - zombie.translation).normalize().xy() * 10.0),
+            Bullet((cursor.translation - zombie.translation).normalize().xy() * 3.0),
         ));
     }
 }
