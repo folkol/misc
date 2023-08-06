@@ -17,7 +17,7 @@ fn gen_input(p: usize, i: u64) -> Vec<u64> {
 
 fn sort_small_few(c: &mut Criterion) {
     let range = 10;
-    c.bench_function("sort", |b| {
+    c.bench_function("sort_small_few", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(1000, range) },
             |v| sort(v),
@@ -28,7 +28,7 @@ fn sort_small_few(c: &mut Criterion) {
 
 fn integer_sort_small_few(c: &mut Criterion) {
     let range = 10;
-    c.bench_function("integer-sort", |b| {
+    c.bench_function("integer_sort_small_few", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(1000, range) },
             |v| integer_sort(v, 0, range as i32),
@@ -38,7 +38,7 @@ fn integer_sort_small_few(c: &mut Criterion) {
 }
 fn sort_large_few(c: &mut Criterion) {
     let range = 10;
-    c.bench_function("sort", |b| {
+    c.bench_function("sort_large_few", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(10_000_000, range) },
             |v| sort(v),
@@ -49,7 +49,7 @@ fn sort_large_few(c: &mut Criterion) {
 
 fn integer_sort_large_few(c: &mut Criterion) {
     let range = 10;
-    c.bench_function("integer-sort", |b| {
+    c.bench_function("integer_sort_large_few", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(10_000_000, range) },
             |v| integer_sort(v, 0, range as i32),
@@ -60,7 +60,7 @@ fn integer_sort_large_few(c: &mut Criterion) {
 
 fn sort_small_many(c: &mut Criterion) {
     let range = 1000000;
-    c.bench_function("sort", |b| {
+    c.bench_function("sort_small_many", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(1000, range) },
             |v| sort(v),
@@ -71,7 +71,7 @@ fn sort_small_many(c: &mut Criterion) {
 
 fn integer_sort_small_many(c: &mut Criterion) {
     let range = 1000000;
-    c.bench_function("integer-sort", |b| {
+    c.bench_function("integer_sort_small_many", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(1000, range) },
             |v| integer_sort(v, 0, range as i32),
@@ -81,7 +81,7 @@ fn integer_sort_small_many(c: &mut Criterion) {
 }
 fn sort_large_many(c: &mut Criterion) {
     let range = 1000000;
-    c.bench_function("sort", |b| {
+    c.bench_function("sort_large_many", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(10_000_000, range) },
             |v| sort(v),
@@ -92,7 +92,7 @@ fn sort_large_many(c: &mut Criterion) {
 
 fn integer_sort_large_many(c: &mut Criterion) {
     let range = 1000000;
-    c.bench_function("integer-sort", |b| {
+    c.bench_function("integer_sort_large_many", |b| {
         b.iter_batched(
             || -> Vec<_> { gen_input(10_000_000, range) },
             |v| integer_sort(v, 0, range as i32),
