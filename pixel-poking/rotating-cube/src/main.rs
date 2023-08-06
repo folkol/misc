@@ -38,7 +38,7 @@ fn main() {
 
 fn rotate(corners: &mut [[f64; 3]; 8]) {
     // xyz, z is facing us, y is up
-    for [x, y, z] in corners.iter_mut() {
+    for [x, _, z] in corners.iter_mut() {
         // multiplying with complex number
         let [a, b] = [1.0f64, 0.01f64];
         let norm = (a * a + b * b).sqrt();
