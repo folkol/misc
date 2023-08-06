@@ -54,18 +54,14 @@ fn update(mut materials: ResMut<Assets<MyMaterial>>, material: Res<Material>, ti
         if let Some(mat) = materials.get_mut(handle) {
             for vec in &mut mat.points {
                 vec.x += vec.z * time.elapsed_seconds() * SPEED;
-                if vec.x < 0.0 {
-                    vec.x += 1.0;
-                }
-                if vec.x > 1.0 {
-                    vec.x -= 1.0;
+                if vec.x < 0.0 || vec.x > 1.0 {
+                    vec.z *= -1.0;
+                    vec.x += vec.z * time.elapsed_seconds() * SPEED;
                 }
                 vec.y += vec.w * time.elapsed_seconds() * SPEED;
-                if vec.y < 0.0 {
-                    vec.y += 1.0;
-                }
-                if vec.y > 1.0 {
-                    vec.y -= 1.0;
+                if vec.y < 0.0 || vec.y > 1.0 {
+                    vec.w *= -1.0;
+                    vec.y += vec.w * time.elapsed_seconds() * SPEED;
                 }
             }
         }
