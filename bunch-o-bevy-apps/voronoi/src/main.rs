@@ -47,21 +47,21 @@ fn setup(
     });
 }
 
-const SPEED: f32 = 0.0001;
+const SPEED: f32 = 0.05;
 
 fn update(mut materials: ResMut<Assets<MyMaterial>>, material: Res<Material>, time: Res<Time>) {
     if let Some(handle) = &material.handle {
         if let Some(mat) = materials.get_mut(handle) {
             for vec in &mut mat.points {
-                vec.x += vec.z * time.elapsed_seconds() * SPEED;
+                vec.x += vec.z * time.delta_seconds() * SPEED;
                 if vec.x < 0.0 || vec.x > 1.0 {
                     vec.z *= -1.0;
-                    vec.x += vec.z * time.elapsed_seconds() * SPEED;
+                    vec.x += vec.z * time.delta_seconds() * SPEED;
                 }
-                vec.y += vec.w * time.elapsed_seconds() * SPEED;
+                vec.y += vec.w * time.delta_seconds() * SPEED;
                 if vec.y < 0.0 || vec.y > 1.0 {
                     vec.w *= -1.0;
-                    vec.y += vec.w * time.elapsed_seconds() * SPEED;
+                    vec.y += vec.w * time.delta_seconds() * SPEED;
                 }
             }
         }

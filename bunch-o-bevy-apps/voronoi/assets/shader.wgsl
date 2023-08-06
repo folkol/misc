@@ -18,6 +18,7 @@ fn fragment(
             min_d = d;
         }
     }
-    let color = colors[neighbour];
+    let intensity = pow(1.0 - min_d, 10.5);
+    let color = colors[neighbour] * intensity;
     return vec4(color.xyz, 1.0);
 }
