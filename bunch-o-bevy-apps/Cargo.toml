@@ -8,6 +8,7 @@ members = [
     "breakthrough",
     "interactive-fractal",
     "bevy-crash-course",
+    "shooter",
 ]
 
 [profile.dev.package."*"]
