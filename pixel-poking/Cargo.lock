@@ -1169,7 +1169,7 @@ dependencies = [
 name = "mandelbrot"
 version = "0.1.0"
 dependencies = [
- "minifb",
+ "minifb 0.24.0",
 ]
 
 [[package]]
@@ -1209,7 +1209,7 @@ dependencies = [
 name = "metaballs"
 version = "0.1.0"
 dependencies = [
- "minifb",
+ "minifb 0.24.0",
 ]
 
 [[package]]
@@ -1259,6 +1259,32 @@ name = "minifb"
 version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c66a1fdd7e946fe33fe9725012e25836bba3655769bee9ee347cce7de3f396df"
+dependencies = [
+ "cc",
+ "dlib 0.5.2",
+ "futures",
+ "instant",
+ "js-sys",
+ "lazy_static",
+ "libc",
+ "orbclient",
+ "raw-window-handle 0.4.3",
+ "serde",
+ "serde_derive",
+ "tempfile",
+ "wasm-bindgen-futures",
+ "wayland-client 0.29.5",
+ "wayland-cursor 0.29.5",
+ "wayland-protocols 0.29.5",
+ "winapi 0.3.9",
+ "x11-dl",
+]
+
+[[package]]
+name = "minifb"
+version = "0.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05eddefadb505d3dcb66a89fa77dd0936e72ec84e891cc8fc36e3c05bfe61103"
 dependencies = [
  "cc",
  "dlib 0.5.2",
@@ -1845,7 +1871,7 @@ dependencies = [
 name = "rainbow"
 version = "0.1.0"
 dependencies = [
- "minifb",
+ "minifb 0.24.0",
 ]
 
 [[package]]
@@ -1913,7 +1939,7 @@ checksum = "f2ff9a1f06a88b01621b7ae906ef0211290d1c8a168a15542486a8f61c0833b9"
 name = "raycaster"
 version = "0.1.0"
 dependencies = [
- "minifb",
+ "minifb 0.24.0",
 ]
 
 [[package]]
@@ -1947,6 +1973,13 @@ dependencies = [
  "pixels",
  "winit 0.28.6",
  "winit_input_helper",
+]
+
+[[package]]
+name = "rotating-cube"
+version = "0.1.0"
+dependencies = [
+ "minifb 0.25.0",
 ]
 
 [[package]]

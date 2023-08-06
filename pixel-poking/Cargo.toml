@@ -9,6 +9,7 @@ members = [
     "rainbow",
     "raycaster",
     "ripples",
+    "rotating-cube",
 ]
 
 [profile.dev.package."*"]
