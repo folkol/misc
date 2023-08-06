@@ -11,7 +11,7 @@ fn fragment(
 ) -> @location(0) vec4<f32> {
     var min_d  = 1337.0;
     var neighbour = 0;
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 20; i++) {
         let d = distance(mesh.uv, points[i].xy);
         if(d < min_d) {
             neighbour = i;
