@@ -18,5 +18,6 @@ fn fragment(
             min_d = d;
         }
     }
-    return colors[neighbour];
+    let color = colors[neighbour];
+    return vec4(color.xyz, 1.0);
 }
