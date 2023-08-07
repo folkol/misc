@@ -10,6 +10,7 @@ members = [
     "raycaster",
     "ripples",
     "rotating-cube",
+    "sierpinski-triangle",
 ]
 
 [profile.dev.package."*"]
