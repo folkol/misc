@@ -11,6 +11,7 @@ members = [
     "ripples",
     "rotating-cube",
     "sierpinski-triangle",
+    "rgb-palette",
 ]
 
 [profile.dev.package."*"]
