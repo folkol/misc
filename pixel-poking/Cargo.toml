@@ -12,6 +12,7 @@ members = [
     "rotating-cube",
     "sierpinski-triangle",
     "rgb-palette",
+    "maze-generator",
 ]
 
 [profile.dev.package."*"]

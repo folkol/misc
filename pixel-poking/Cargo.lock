@@ -1173,6 +1173,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "maze-generator"
+version = "0.1.0"
+dependencies = [
+ "minifb 0.24.0",
+ "rand",
+]
+
+[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
