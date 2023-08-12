@@ -31,7 +31,7 @@ fn main() {
             walls.entry((x, y, x, y + 1)).or_insert(true);
         }
     }
-    window.limit_update_rate(Some(Duration::from_millis(1000 / 60)));
+    // window.limit_update_rate(Some(Duration::from_millis(1000 / 4)));
     init_grid(&mut buffer, &walls);
     let mut visited: HashSet<(usize, usize)> = HashSet::new();
     let mut stack: Vec<(usize, usize)> = Vec::new();
