@@ -1,6 +1,6 @@
 use std::env::args;
-use std::io::{Read, stdin, stdout, Write};
-use std::thread::sleep_ms;
+use std::io::{Read, stdout, Write};
+use std::time::Duration;
 
 use crossterm::{
     ExecutableCommand,
@@ -8,6 +8,7 @@ use crossterm::{
     style::Print,
 };
 use crossterm::cursor::{Hide, MoveTo, Show};
+use crossterm::event::{Event, poll, read};
 use crossterm::terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen};
 use crossterm::terminal::size;
 
@@ -33,7 +34,7 @@ fn main() -> std::io::Result<()> {
     let mut coins = [0usize; WIDTH * HEIGHT];
 
     let (mut x, mut y) = (WIDTH / 2, HEIGHT / 2);
-    for byte in walk.bytes() {
+    'label: for byte in walk.bytes() {
         for step in [byte >> 6 & 0b11, byte >> 4 & 0b11, byte >> 2 & 0b11, byte & 0b11] {
             match step {
                 0b00 => {
@@ -88,15 +89,12 @@ fn main() -> std::io::Result<()> {
                 MoveTo(x as u16, y as u16),
                 Print(symbol)
             )?;
-            sleep_ms(1000 / 10);
+            if poll(Duration::from_millis(1000 / 10))? {
+                if let Event::Key(_) = read()? { break 'label; }
+            }
         }
     }
 
-    for byte in stdin().bytes().map_while(Result::ok) {
-        if byte == b'q' {
-            break;
-        }
-    }
     crossterm::terminal::disable_raw_mode()?;
     execute!(
         stdout(),
