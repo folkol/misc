@@ -236,6 +236,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "casey-circle"
+version = "0.1.0"
+dependencies = [
+ "minifb 0.24.0",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.80"
 source = "registry+https://github.com/rust-lang/crates.io-index"

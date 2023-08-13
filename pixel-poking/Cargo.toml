@@ -13,6 +13,7 @@ members = [
     "sierpinski-triangle",
     "rgb-palette",
     "maze-generator",
+    "casey-circle",
 ]
 
 [profile.dev.package."*"]
