@@ -14,15 +14,8 @@ fn main() {
         WIDTH,
         HEIGHT,
         WindowOptions {
-            // borderless: false,
-            // title: false,
             resize: true,
-            // ..WindowOptions::default()
             scale: Scale::X8,
-            // scale_mode: ScaleMode::Stretch,
-            // topmost: false,
-            // transparency: false,
-            // none: false,
             ..WindowOptions::default()
         },
     )

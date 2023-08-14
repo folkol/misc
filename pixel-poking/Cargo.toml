@@ -14,6 +14,7 @@ members = [
     "rgb-palette",
     "maze-generator",
     "casey-circle",
+    "bresenham",
 ]
 
 [profile.dev.package."*"]

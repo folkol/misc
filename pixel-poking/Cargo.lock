@@ -200,6 +200,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bresenham"
+version = "0.1.0"
+dependencies = [
+ "pixels",
+ "winit 0.28.6",
+ "winit_input_helper",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
