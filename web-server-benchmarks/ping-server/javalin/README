@@ -1,0 +1,4 @@
+# build and run
+mvn package
+java -jar target/javalin-1.0-SNAPSHOT.jar
+

@@ -1,0 +1,4 @@
+# build and run
+
+mvn package
+java -jar target/vertx-ping-1.0.0-SNAPSHOT-fat.jar
