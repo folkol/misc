@@ -6,13 +6,13 @@
  - characters change in a repeating pattern
 */
 
-use std::io::{BufWriter, stdout, Write};
+use std::io::{stdout, BufWriter, Write};
 use std::thread;
 use std::time::{Duration, SystemTime};
 
-use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
 use rand::prelude::SliceRandom;
+use rand::{thread_rng, Rng};
 use termion::color::{Fg, Reset, Rgb};
 use termion::cursor::Show;
 use termion::input::TermRead;
@@ -58,7 +58,7 @@ fn main() {
                         Fg(Rgb(0, (grid[i as usize].1 * 255.0) as u8, 0)),
                         c
                     )
-                        .unwrap();
+                    .unwrap();
                 }
             }
         }
@@ -67,9 +67,6 @@ fn main() {
             if *next_move < now {
                 *next_move = now + Duration::from_millis(*v as u64);
                 *y += 1;
-                if *x == 1 {
-                    eprintln!("x: {} y: {}", *x, *y);
-                }
                 for i in ((*y - TAIL)..=*y).rev() {
                     let step = *y - i;
                     if i >= 1 && i <= rows as i32 {
@@ -92,7 +89,7 @@ fn main() {
                                     Fg(Rgb(0, (c * 255.0) as u8, 0)),
                                     cell.0
                                 )
-                                    .unwrap();
+                                .unwrap();
                             }
                         }
                     }
@@ -110,7 +107,7 @@ fn main() {
                 *y = rng.gen_range(-(rows as i32)..0);
                 *x = *(next_lanes.next().unwrap()) as usize;
                 *v = rng.gen_range(1..=3) * VISCOSITY;
-                // *next_move = now + Duration::from_millis(*v as u64);
+                *next_move = now + Duration::from_millis(*v as u64);
             }
         }
 
