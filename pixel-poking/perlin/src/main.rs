@@ -3,8 +3,8 @@ use rand::{Rng, thread_rng};
 
 const WIDTH: usize = 1000;
 const HEIGHT: usize = 1000;
-const GRID_WIDTH: usize = 4;
-const GRID_HEIGHT: usize = 4;
+const GRID_WIDTH: usize = 10;
+const GRID_HEIGHT: usize = 10;
 
 fn main() {
     let (mut e, mut fb) = mini_gl_fb::gotta_go_fast("Perlin2D", WIDTH as f64, HEIGHT as f64);
@@ -23,7 +23,7 @@ fn main() {
 
     draw(&mut buf, &mut buff, &gradients);
 
-    show_gradients(&mut buf, &mut gradients);
+    // show_gradients(&mut buf, &mut gradients);
 
     fb.glutin_handle_basic_input(&mut e, |fb, input| {
         if input.keys.contains_key(&VirtualKeyCode::Q)
@@ -46,14 +46,14 @@ fn sample(gradients: &[(f32, f32)], x: f32, y: f32) -> f32 {
     interpolate(
         (x - grid_x.floor() * grid_step_x) / grid_step_x,
         (y - grid_y.floor() * grid_step_y) / grid_step_y,
-        contribution(&gradients, x, y, grid_x.floor(), grid_y.floor()),
-        contribution(&gradients, x, y, grid_x.ceil(), grid_y.floor()),
-        contribution(&gradients, x, y, grid_x.floor(), grid_y.ceil()),
-        contribution(&gradients, x, y, grid_x.ceil(), grid_y.ceil()),
+        contribution(gradients, x, y, grid_x.floor(), grid_y.floor()),
+        contribution(gradients, x, y, grid_x.ceil(), grid_y.floor()),
+        contribution(gradients, x, y, grid_x.floor(), grid_y.ceil()),
+        contribution(gradients, x, y, grid_x.ceil(), grid_y.ceil()),
     )
 }
 
-fn draw(buf: &mut Vec<[u8; 4]>, buff: &mut Vec<f32>, gradients: &[(f32, f32)]) {
+fn draw(buf: &mut [[u8; 4]], buff: &mut Vec<f32>, gradients: &[(f32, f32)]) {
     let mut min = f32::MAX;
     let mut max = f32::MIN;
     for y in 0..HEIGHT {
@@ -101,7 +101,7 @@ fn contribution(gradients: &[(f32, f32)], x: f32, y: f32, gx: f32, gy: f32) -> f
     gradient.0 * dx + gradient.1 * dy
 }
 
-fn show_gradients(buf: &mut [[u8; 4]], gradients: &mut Vec<(f32, f32)>) {
+fn show_gradients(buf: &mut [[u8; 4]], gradients: &[(f32, f32)]) {
     let grid_step_x = 1.0 / GRID_WIDTH as f32;
     let grid_step_y = 1.0 / GRID_HEIGHT as f32;
     let arrow_len = 10;
