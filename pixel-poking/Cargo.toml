@@ -15,6 +15,7 @@ members = [
     "maze-generator",
     "casey-circle",
     "bresenham",
+    "perlin",
 ]
 
 [profile.dev.package."*"]
