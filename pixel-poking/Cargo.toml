@@ -16,6 +16,7 @@ members = [
     "casey-circle",
     "bresenham",
     "perlin",
+    "value-noise",
 ]
 
 [profile.dev.package."*"]

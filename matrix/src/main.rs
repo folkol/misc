@@ -101,7 +101,6 @@ fn main() {
             .collect();
         free_lanes.shuffle(&mut rng);
         let mut next_lanes = free_lanes.iter();
-        // let now = SystemTime::now();
         for (x, y, v, next_move) in droplets.iter_mut() {
             if *y >= cols as i32 + TAIL {
                 *y = rng.gen_range(-(rows as i32)..0);
