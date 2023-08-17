@@ -4,11 +4,10 @@ use std::time::Duration;
 use minifb::{Key, KeyRepeat, Window, WindowOptions};
 use rand::{Rng, thread_rng};
 use rand::distributions::uniform::Uniform;
-use rand::prelude::*;
 
 const WIDTH: usize = 1600;
 const HEIGHT: usize = 1200;
-const PITCH: usize = WIDTH / 10;
+const NUM_OCTAVES: usize = 10;
 
 fn main() {
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
@@ -22,39 +21,50 @@ fn main() {
         },
     )
     .unwrap();
-    let range = Uniform::from(0..HEIGHT / 2);
-    let lattice: Vec<_> = thread_rng()
-        .sample_iter(&range)
-        .take(1 + WIDTH / PITCH)
-        .collect();
-
-    let yx: Vec<_> = (0..WIDTH)
-        .map(|x| {
-            let a = lattice[x / PITCH];
-            let b = lattice[1 + x / PITCH];
-            let t = (x % PITCH) as f32 / PITCH as f32;
+    let mut ys: Vec<_> = vec![0; WIDTH];
+    for octave in 1..NUM_OCTAVES {
+        let pitch = WIDTH / 2usize.pow(octave as u32);
+        let range = Uniform::from(0..HEIGHT / 2usize.pow(octave as u32));
+        let lattice: Vec<_> = thread_rng()
+            .sample_iter(&range)
+            .take(2 * (WIDTH / pitch))
+            .collect();
+        println!("{pitch:?}");
+        for (x, point) in ys.iter_mut().enumerate() {
+            let a = lattice[x / pitch];
+            let b = lattice[1 + x / pitch];
+            let t = (x % pitch) as f32 / pitch as f32;
             let y = cosine_interpolation(a, b, t);
-            y
-        })
-        .collect();
+            if x == 10 {
+                *point += y;
+            } else {
+                *point += y;
+            }
+        }
+    }
+    let min = *ys.iter().min().unwrap();
+    let max = *ys.iter().max().unwrap();
 
     window.limit_update_rate(Some(Duration::from_millis(1000 / 60)));
     while window.is_open() && !window.is_key_pressed(Key::Escape, KeyRepeat::No) {
-        for (x, y) in yx.iter().enumerate() {
-            plot(&mut buffer, x, y + HEIGHT / 4);
+        for (x, y) in ys.iter().enumerate() {
+            plot(
+                &mut buffer,
+                x,
+                map(min, max, HEIGHT / 4, 3 * HEIGHT / 4, *y),
+            );
         }
         window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
     }
 }
 
-fn lerp(lo: usize, hi: usize, t: f32) -> usize {
-    (lo as f32 * t + hi as f32 * (1.0 - t)) as usize
+fn map(from_lo: usize, from_hi: usize, to_lo: usize, to_hi: usize, x: usize) -> usize {
+    let t = (x - from_lo) as f32 / (from_hi - from_lo) as f32;
+    (to_lo as f32 * (1.0 - t) + to_hi as f32 * t) as usize
 }
 fn cosine_interpolation(lo: usize, hi: usize, t1: f32) -> usize {
     let t = ((t1 * PI).cos() + 1.0) / 2.0;
-    let i = (lo as f32 * t + hi as f32 * (1.0 - t)) as usize;
-    println!("{lo} {hi} {t1} {t} {i}");
-    i
+    (lo as f32 * t + hi as f32 * (1.0 - t)) as usize
 }
 
 fn plot(buffer: &mut Vec<u32>, x: usize, y: usize) {
@@ -62,10 +72,6 @@ fn plot(buffer: &mut Vec<u32>, x: usize, y: usize) {
     if pos < WIDTH * HEIGHT {
         buffer[pos] = to_0rgb(255, 255, 255);
     }
-}
-
-fn paint(buffer: &mut Vec<u32>) {
-    buffer[2700] = to_0rgb(255, 0, 0);
 }
 
 fn to_0rgb(r: u32, g: u32, b: u32) -> u32 {
