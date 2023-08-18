@@ -45,7 +45,7 @@ fn main() -> io::Result<()> {
     )?;
 
     let (cols, rows) = terminal::size()?;
-    let (mut player_x, mut player_y) = (3, 3);
+    let (mut player_x, mut player_y) = (1, 1);
     let (mut prev_player_x, mut prev_player_y) = (player_x, player_y);
     repaint(&mut stdout, player_x, player_y)?;
 
@@ -94,19 +94,19 @@ fn main() -> io::Result<()> {
                 terminal::Clear(terminal::ClearType::All),
                 style::PrintStyledContent("YOU WIN".magenta()),
             )?;
-            thread::sleep_ms(2000);
+            thread::sleep(Duration::from_secs(2));
             break;
         }
     }
     terminal::disable_raw_mode()?;
-    execute!(stdout, Show, terminal::LeaveAlternateScreen,)?;
+    execute!(stdout, Show, terminal::LeaveAlternateScreen)?;
     Ok(())
 }
 
 fn repaint(stdout: &mut Stdout, player_x: u16, player_y: u16) -> io::Result<()> {
     for (row, line) in MAP.iter().enumerate() {
         for (col, x) in line.iter().enumerate() {
-            if los(col as i32, row as i32, player_x as i32, player_y as i32) {
+            if any_los(col as i32, row as i32, player_x as i32, player_y as i32) {
                 queue!(
                     stdout,
                     cursor::MoveTo(col as u16, row as u16),
@@ -131,7 +131,15 @@ fn repaint(stdout: &mut Stdout, player_x: u16, player_y: u16) -> io::Result<()> 
     Ok(())
 }
 
+fn any_los(x0: i32, y0: i32, x1: i32, y1: i32) -> bool {
+    let neighbours = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+    return neighbours.iter().any(|(dx, dy)| los(x0 + dx, y0 + dy, x1, y1));
+}
+
 fn los(x0: i32, y0: i32, x1: i32, y1: i32) -> bool {
+    if x0 < 0 || y0 < 0 || y0 >= MAP.len() as i32 || x0 >= MAP[0].len() as i32 {
+        return false;
+    }
     let steps = 100;
     let dx = (x1 - x0) as f32 / steps as f32;
     let dy = (y1 - y0) as f32 / steps as f32;
@@ -140,7 +148,7 @@ fn los(x0: i32, y0: i32, x1: i32, y1: i32) -> bool {
     for _ in 0..steps {
         let x = i.round() as usize;
         let y = j.round() as usize;
-        if MAP[y][x] == b'#' {
+        if MAP[y][x] == b'#' && !(y == y1 as usize && x == x1 as usize) {
             return false;
         }
         i += dx;
