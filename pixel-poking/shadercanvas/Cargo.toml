@@ -6,3 +6,10 @@ edition = "2021"
 [dependencies]
 winit = "0.28"
 winit_input_helper = "0.14"
+env_logger = "0.10.0"
+log = "0.4.20"
+wgpu = "0.17.0"
+pollster = "0.3.0"
+
+[profile.dev.package."*"]
+opt-level = 3
