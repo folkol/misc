@@ -1,5 +1,5 @@
-use wgpu::{SurfaceError, TextureFormat};
-use winit::event::{Event, WindowEvent};
+use wgpu::{BindGroupLayout, BindGroupLayoutDescriptor, SurfaceError, TextureFormat};
+use winit::event::{Event, VirtualKeyCode, WindowEvent};
 use winit::event_loop::ControlFlow;
 use winit::window::{Window, WindowBuilder};
 
@@ -11,7 +11,8 @@ struct State {
     config: wgpu::SurfaceConfiguration,
     size: winit::dpi::PhysicalSize<u32>,
     window: Window,
-    render_pipeline: wgpu::RenderPipeline,
+    render_pipelines: Vec<wgpu::RenderPipeline>,
+    current_pipeline: usize,
 }
 
 impl State {
@@ -92,8 +93,8 @@ impl State {
                 push_constant_ranges: &[],
             });
 
-        let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("Render Pipeline"),
+        let render_pipeline_brown = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("Render Pipeline 1"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
                 module: &shader,
@@ -126,6 +127,40 @@ impl State {
             },
             multiview: None,
         });
+        let render_pipeline_colored = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("Render Pipeline 2"),
+            layout: Some(&render_pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: "vs_main",
+                buffers: &[],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: "fs_main_color",
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: config.format,
+                    blend: Some(wgpu::BlendState::REPLACE),
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+            }),
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                strip_index_format: None,
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: Some(wgpu::Face::Back),
+                polygon_mode: wgpu::PolygonMode::Fill,
+                unclipped_depth: false,
+                conservative: false,
+            },
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState {
+                count: 1,
+                mask: !0,
+                alpha_to_coverage_enabled: false,
+            },
+            multiview: None,
+        });
 
         Self {
             window,
@@ -134,7 +169,8 @@ impl State {
             queue,
             config,
             size,
-            render_pipeline,
+            render_pipelines: vec![render_pipeline_brown, render_pipeline_colored],
+            current_pipeline: 0,
         }
     }
     pub fn window(&self) -> &Window {
@@ -177,7 +213,7 @@ impl State {
                 depth_stencil_attachment: None,
             });
 
-            render_pass.set_pipeline(&self.render_pipeline);
+            render_pass.set_pipeline(&self.render_pipelines[self.current_pipeline]);
             render_pass.draw(0..3, 0..1); // This is where @builtin(vertex_index) comes from.
         }
 
@@ -194,10 +230,19 @@ pub async fn run() {
     let window = WindowBuilder::new().build(&event_loop).unwrap();
 
     let mut state = State::new(window).await;
+    let mut held = false;
 
     event_loop.run(move |event, _, control_flow| {
         if input_helper.update(&event) && input_helper.close_requested() {
             *control_flow = ControlFlow::Exit
+        }
+        if input_helper.key_pressed(VirtualKeyCode::Space) && !held {
+            state.current_pipeline = (state.current_pipeline + 1) % state.render_pipelines.len();
+            println!("new pipeline: {}", state.current_pipeline);
+            held = true;
+        }
+        if input_helper.key_released(VirtualKeyCode::Space) {
+            held = false;
         }
         let mut r = 0.1f64;
         let mut g = 0.2f64;
