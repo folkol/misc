@@ -2,7 +2,7 @@ use winit::event::{Event, WindowEvent};
 use winit::event_loop::ControlFlow;
 use winit::window::WindowBuilder;
 
-fn main() {
+pub fn run() {
     let event_loop = winit::event_loop::EventLoop::new();
     let mut input_helper = winit_input_helper::WinitInputHelper::new();
     let _window = WindowBuilder::new().build(&event_loop).unwrap();

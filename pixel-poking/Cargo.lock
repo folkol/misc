@@ -2152,6 +2152,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "shadercanvas"
+version = "0.1.0"
+dependencies = [
+ "winit 0.28.6",
+ "winit_input_helper",
+]
+
+[[package]]
 name = "shared_library"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -17,6 +17,7 @@ members = [
     "bresenham",
     "perlin",
     "value-noise",
+    "shadercanvas",
 ]
 
 [profile.dev.package."*"]
