@@ -19,9 +19,9 @@ function shiftRow(state, n) {
   row.push(...slice)
 }
 function shiftRows(state) {
-  shiftRow(state, 1);
-  shiftRow(state, 2);
-  shiftRow(state, 3);
+  for(let row = 0; row < Nb; row++) {
+    shiftRow(state, row);
+  }
 }
 
 let state = [
@@ -34,6 +34,6 @@ let state = [
 shiftRow(state, 3);
 
 module.exports = {
-  shiftRow,
+  shiftRows,
   subBytes,
 }
