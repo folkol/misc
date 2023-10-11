@@ -88,8 +88,17 @@ function mixColumns(state) {
   }
 }
 
+function addRoundKey(state, key) {
+  state.forEach((row, i) => {
+    row.forEach((_, j) => {
+      state[i][j] ^= key[i][j];
+    });
+  });
+}
+
 module.exports = {
   shiftRows,
   subBytes,
   mixColumns,
+  addRoundKey,
 };
