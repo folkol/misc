@@ -61,7 +61,6 @@ const MUL_3 = [
   0x0b, 0x08, 0x0d, 0x0e, 0x07, 0x04, 0x01, 0x02, 0x13, 0x10, 0x15, 0x16, 0x1f, 0x1c, 0x19, 0x1a,
 ];
 
-
 // Polynomial multiplication modulo x^4 + 1, see §5.1.3
 function mixColumns(state) {
   function mul(f, x) {
@@ -92,12 +91,12 @@ function mixColumns(state) {
 function addRoundKey(state, key) {
   state.forEach((row, i) => {
     row.forEach((_, j) => {
-      state[i][j] ^= key[i][j];
+      state[i][j] ^= key[j][i];
     });
   });
 }
 
-const R_CON = [
+const ROUND_CONSTANTS = [
   0x00,
   0x01,
   0x02,
@@ -115,11 +114,11 @@ function rotWord(temp) {
   shiftRow(temp, 1);
 }
 
-function subWord(temp) {
-  temp[0] = S_BOX[temp[0]];
-  temp[1] = S_BOX[temp[1]];
-  temp[2] = S_BOX[temp[2]];
-  temp[3] = S_BOX[temp[3]];
+function subWord(word) {
+  word[0] = S_BOX[word[0]];
+  word[1] = S_BOX[word[1]];
+  word[2] = S_BOX[word[2]];
+  word[3] = S_BOX[word[3]];
 }
 
 function expandKey(key) {
@@ -135,7 +134,7 @@ function expandKey(key) {
     if (i % Nk === 0) {
       rotWord(temp);
       subWord(temp);
-      temp[0] ^= R_CON[Math.floor(i / Nk)];
+      temp[0] ^= ROUND_CONSTANTS[Math.floor(i / Nk)];
     } else if (Nk > 6 && (i % Nk) === 4) {
       subWord(temp);
     }
@@ -149,10 +148,35 @@ function expandKey(key) {
   return keySchedule;
 }
 
+function cipher(input, w) {
+  let state = [
+    [input[0], input[4], input[8], input[12]],
+    [input[1], input[5], input[9], input[13]],
+    [input[2], input[6], input[10], input[14]],
+    [input[3], input[7], input[11], input[15]],
+  ];
+
+  addRoundKey(state, w.slice(0, 4));
+
+  for (let round = 1; round < numRounds; round++) {
+    subBytes(state);
+    shiftRows(state);
+    mixColumns(state);
+    addRoundKey(state, w.slice(round * Nk, (round + 1) * Nk));
+  }
+
+  subBytes(state);
+  shiftRows(state);
+  addRoundKey(state, w.slice(40, 44));
+
+  return state;
+}
+
 module.exports = {
   shiftRows,
   subBytes,
   mixColumns,
   addRoundKey,
   expandKey,
+  cipher,
 };
