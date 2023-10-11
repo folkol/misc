@@ -13,15 +13,13 @@ function subBytes(state) {
 }
 
 // Shift bytes of each row left #row steps (row 0 shifted 0 steps, row 1 1 step etc)
-function shiftRow(state, n) {
-  let row = state[n];
-  let slice = row.splice(0, n);
-  row.push(...slice)
-}
 function shiftRows(state) {
-  for(let row = 0; row < Nb; row++) {
-    shiftRow(state, row);
+  function shiftRow(row, n) {
+    let prefix = row.splice(0, n);
+    row.push(...prefix);
   }
+
+  state.forEach(shiftRow);
 }
 
 let state = [
@@ -31,9 +29,7 @@ let state = [
   [12, 13, 14, 15],
 ];
 
-shiftRow(state, 3);
-
 module.exports = {
   shiftRows,
   subBytes,
-}
+};
