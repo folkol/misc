@@ -2,7 +2,7 @@
  * Test cases from Appendix B
  */
 
-const { subBytes, shiftRows, mixColumns, addRoundKey } = require('./aes');
+const { subBytes, shiftRows, mixColumns, addRoundKey, expandKey } = require('./aes');
 
 test('subBytes', () => {
   let state = [
@@ -79,5 +79,21 @@ test('addRoundKey', () => {
     [0x9c, 0x9f, 0x5b, 0x6a],
     [0x7f, 0x35, 0xea, 0x50],
     [0xf2, 0x2b, 0x43, 0x49],
+  ]);
+});
+
+test('expandKey', () => {
+  let key = [
+    [0x2b, 0x7e, 0x15, 0x16],
+    [0x28, 0xae, 0xd2, 0xa6],
+    [0xab, 0xf7, 0x15, 0x88],
+    [0x09, 0xcf, 0x4f, 0x3c],
+  ];
+
+  let roundKeys = expandKey(key);
+
+  expect(roundKeys.length).toBe(44);
+  expect(roundKeys.slice(-1)).toEqual([
+    [0xb6, 0x63, 0x0c, 0xa6],
   ]);
 });
