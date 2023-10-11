@@ -15,9 +15,8 @@ function subBytes(state) {
 // Shift bytes of each row left #row steps (row 0 shifted 0 steps, row 1 1 step etc)
 function shiftRow(state, n) {
   let row = state[n];
-  let slice = row.slice(0, n + 1);
-  console.log(row, slice, Nb - n - 1, n)
-  row.splice(Nb - n - 1, n, ...slice)
+  let slice = row.splice(0, n);
+  row.push(...slice)
 }
 function shiftRows(state) {
   shiftRow(state, 1);

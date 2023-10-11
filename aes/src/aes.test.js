@@ -1,8 +1,6 @@
 /**
  * Test cases from Appendix B
  */
-// import { it, expect } from 'jest';
-// import { shiftRow, subBytes } from './aes';
 
 const { subBytes, shiftRow } = require('./aes.js');
 
@@ -60,7 +58,8 @@ it('shiftRow 3', () => {
       [15, 12, 13, 14],
     ],
   );
-})
+});
+
 // it('shiftRows', () => {
 //     let state = [
 //         [0xd4, 0xe0, 0xb8, 0x1e],
