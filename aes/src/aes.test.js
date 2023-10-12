@@ -97,19 +97,14 @@ test('expandKey', () => {
   ]);
 });
 
-test('cipher #1', () => {
+test('cipher', () => {
   let input = fromHex('32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34');
   let key = fromHex('2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c');
   let keySchedule = expandKey(key);
 
   let cipherText = cipher(input, keySchedule);
 
-  expect(cipherText).toEqual([
-    [0x39, 0x02, 0xdc, 0x19],
-    [0x25, 0xdc, 0x11, 0x6a],
-    [0x84, 0x09, 0x85, 0x0b],
-    [0x1d, 0xfb, 0x97, 0x32],
-  ]);
+  expect(cipherText).toEqual(fromHex('39 25 84 1d 02 dc 09 fb dc 11 85 97 19 6a 0b 32'));
 });
 
 test('invCipher', () => {
