@@ -87,7 +87,7 @@ test('addRoundKey', () => {
 });
 
 test('expandKey', () => {
-  let key = fromHex("2b7e151628aed2a6abf7158809cf4f3c");
+  let key = fromHex('2b7e151628aed2a6abf7158809cf4f3c');
 
   let roundKeys = expandKey(key);
 
@@ -98,23 +98,8 @@ test('expandKey', () => {
 });
 
 test('cipher #1', () => {
-  let input = fromHex("32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34")
-  let key = fromHex("2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c");
-  let keySchedule = expandKey(key);
-
-  let cipherText = cipher(input, keySchedule);
-
-  expect(cipherText).toEqual([
-    [0x39, 0x02, 0xdc, 0x19],
-    [0x25, 0xdc, 0x11, 0x6a],
-    [0x84, 0x09, 0x85, 0x0b],
-    [0x1d, 0xfb, 0x97, 0x32],
-  ]);
-})
-
-test('cipher #2', () => {
-  let input = "00112233445566778899aabbccddeeff";
-  let key = "000102030405060708090a0b0c0d0e0f";
+  let input = fromHex('32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34');
+  let key = fromHex('2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c');
   let keySchedule = expandKey(key);
 
   let cipherText = cipher(input, keySchedule);
@@ -128,20 +113,16 @@ test('cipher #2', () => {
 });
 
 test('invCipher', () => {
-  let input = new Uint8Array([
-    0x69, 0xc4, 0xe0, 0xd8, 0x6a, 0x7b, 0x04, 0x30, 0xd8, 0xcd, 0xb7, 0x80, 0x70, 0xb4, 0xc5, 0x5a,
-  ]);
-  let key = [
-    [0x00, 0x01, 0x02, 0x03],
-    [0x04, 0x05, 0x06, 0x07],
-    [0x08, 0x09, 0x0a, 0x0b],
-    [0x0c, 0x0d, 0x0e, 0x0f],
+  let input = [
+    [0x39, 0x02, 0xdc, 0x19],
+    [0x25, 0xdc, 0x11, 0x6a],
+    [0x84, 0x09, 0x85, 0x0b],
+    [0x1d, 0xfb, 0x97, 0x32],
   ];
+  let key = fromHex('2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c');
   let keySchedule = expandKey(key);
 
   let plaintext = invCipher(input, keySchedule);
 
-  expect(plaintext).toEqual([
-    0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34,
-  ]);
+  expect(plaintext).toEqual(fromHex('32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34'));
 });

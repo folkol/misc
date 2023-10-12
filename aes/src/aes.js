@@ -283,11 +283,16 @@ function expandKey(key) {
   return keySchedule;
 }
 
-function cipher(input, w) {
-  function hex(x) {
-    return x.map(x => x.toString(16).padStart(2, '0')).join('');
-  }
+function transpose(x) {
+  return [
+    [x[0][0], x[1][0], x[2][0], x[3][0]],
+    [x[0][1], x[1][1], x[2][1], x[3][1]],
+    [x[0][2], x[1][2], x[2][2], x[3][2]],
+    [x[0][3], x[1][3], x[2][3], x[3][3]],
+  ]
+}
 
+function cipher(input, w) {
   let state = [
     [input[0], input[4], input[8], input[12]],
     [input[1], input[5], input[9], input[13]],
@@ -295,37 +300,53 @@ function cipher(input, w) {
     [input[3], input[7], input[11], input[15]],
   ];
 
-  addRoundKey(state, w.slice(0, 4));
+  addRoundKey(state, transpose(w.slice(0, 4)));
 
   for (let round = 1; round < numRounds; round++) {
     subBytes(state);
     shiftRows(state);
     mixColumns(state);
-    addRoundKey(state, w.slice(round * Nk, (round + 1) * Nk));
+    addRoundKey(state, transpose(w.slice(round * Nk, (round + 1) * Nk)));
   }
 
   subBytes(state);
   shiftRows(state);
-  addRoundKey(state, w.slice(40, 44));
+  addRoundKey(state, transpose(w.slice(40, 44)));
 
   return state;
-  // return state.flatMap(x => x);
 }
 
 function invCipher(state, w) {
-  addRoundKey(state, w.slice(40, 44));
+  addRoundKey(state, transpose(w.slice(40, 44)));
   for (let round = numRounds - 1; round > 0; round--) {
     invShiftRows(state);
     invSubBytes(state);
-    addRoundKey(state, w.slice(round * numColumns, (round + 1) * (numColumns)));
+    addRoundKey(state, transpose(w.slice(round * numColumns, (round + 1) * (numColumns))));
     invMixColumns(state);
   }
 
   invShiftRows(state);
   invSubBytes(state);
-  addRoundKey(state, w.slice(0, numColumns));
+  addRoundKey(state, transpose(w.slice(0, numColumns)));
 
-  return state;
+  return [
+    state[0][0],
+    state[1][0],
+    state[2][0],
+    state[3][0],
+    state[0][1],
+    state[1][1],
+    state[2][1],
+    state[3][1],
+    state[0][2],
+    state[1][2],
+    state[2][2],
+    state[3][2],
+    state[0][3],
+    state[1][3],
+    state[2][3],
+    state[3][3],
+  ];
 }
 
 module.exports = {
