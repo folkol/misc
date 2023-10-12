@@ -1,11 +1,19 @@
 /**
- * Test cases from Appendix B
+ * Test cases from Appendix B (https://csrc.nist.gov/files/pubs/fips/197/final/docs/fips-197.pdf)
  */
-
-const { subBytes, shiftRows, mixColumns, addRoundKey, expandKey, cipher, invCipher } = require('./aes');
+const {
+  subBytes,
+  shiftRows,
+  mixColumns,
+  addRoundKey,
+  expandKey,
+  cipher,
+  invCipher,
+} = require('./aes');
 
 function fromHex(hex) {
-  return [...hex.matchAll(/[\da-f]{2} ?/g)].map(byte => parseInt(byte, 16));
+  let hexPairs = [...hex.matchAll(/[\da-f]{2} ?/g)];
+  return hexPairs.map(byte => parseInt(byte, 16));
 }
 
 test('subBytes', () => {
@@ -92,9 +100,7 @@ test('expandKey', () => {
   let roundKeys = expandKey(key);
 
   expect(roundKeys.length).toBe(44);
-  expect(roundKeys.slice(-1)).toEqual([
-    [0xb6, 0x63, 0x0c, 0xa6],
-  ]);
+  expect(roundKeys.slice(-1)).toEqual([[0xb6, 0x63, 0x0c, 0xa6]]);
 });
 
 test('cipher', () => {

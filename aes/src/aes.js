@@ -31,6 +31,10 @@ let xorRow = (row, key) => row.forEach((_, i) => row[i] ^= key[i]);
 let subWord = (word, mapping = S_BOX) => word.forEach((e, i) => word[i] = mapping[e]);
 let xorArray = (array, key) => array.forEach((row, i) => xorRow(row, key[i]));
 let addRoundKey = (state, key) => xorArray(state, transpose(key));
+let transpose = array => array[0].map((_, column) => array.map(row => row[column]));
+let makeOutput = state => transpose(state).flatMap(x => x);
+let makeState = input => transpose(chunks(input));
+let chunks = key => [key.slice(0, 4), key.slice(4, 8), key.slice(8, 12), key.slice(12, 16)];
 
 // Polynomial multiplication modulo x^4 + 1, see §5.1.3
 function mixColumns(state, coefficients = [2, 1, 1, 3]) {
@@ -45,47 +49,20 @@ function mixColumns(state, coefficients = [2, 1, 1, 3]) {
 }
 
 function expandKey(key) {
-  let keySchedule = [
-    key.slice(0, 4),
-    key.slice(4, 8),
-    key.slice(8, 12),
-    key.slice(12, 16),
-  ];
+  let w = chunks(key);
 
   for (let i = Nk; i < numColumns * (numRounds + 1); i++) {
-    let temp = [...keySchedule[i - 1]];
+    let temp = [...w[i - 1]];
     if (i % Nk === 0) {
       rotWord(temp);
       subWord(temp);
       temp[0] ^= ROUND_CONSTANTS[Math.floor(i / Nk)];
-    } else if (Nk > 6 && (i % Nk) === 4) {
-      subWord(temp);
     }
-    keySchedule[i] = [...keySchedule[i - Nk]];
-    keySchedule[i][0] ^= temp[0];
-    keySchedule[i][1] ^= temp[1];
-    keySchedule[i][2] ^= temp[2];
-    keySchedule[i][3] ^= temp[3];
+    w[i] = [...w[i - Nk]];
+    xorRow(w[i], temp);
   }
 
-  return keySchedule;
-}
-
-function transpose(array) {
-  return array[0].map((_, column) => array.map(row => row[column]));
-}
-
-function makeState(input) {
-  return [
-    [input[0], input[4], input[8], input[12]],
-    [input[1], input[5], input[9], input[13]],
-    [input[2], input[6], input[10], input[14]],
-    [input[3], input[7], input[11], input[15]],
-  ];
-}
-
-function makeOutput(state) {
-  return [state[0][0], state[1][0], state[2][0], state[3][0], state[0][1], state[1][1], state[2][1], state[3][1], state[0][2], state[1][2], state[2][2], state[3][2], state[0][3], state[1][3], state[2][3], state[3][3]];
+  return w;
 }
 
 function cipher(input, w) {
@@ -126,5 +103,11 @@ function invCipher(input, w) {
 }
 
 module.exports = {
-  shiftRows, subBytes, mixColumns, addRoundKey, expandKey, cipher, invCipher,
+  shiftRows,
+  subBytes,
+  mixColumns,
+  addRoundKey,
+  expandKey,
+  cipher,
+  invCipher,
 };
