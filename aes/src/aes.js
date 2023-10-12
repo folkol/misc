@@ -1,5 +1,5 @@
 const numColumns = 4;
-const Nk = 4;  // Number of words in key
+const Nr = 4;  // Number of words in key
 const numRounds = 10;
 
 // XORShift after multiplicative inverse, see §5.1.1
@@ -19,22 +19,22 @@ let MUL = {
 const ROUND_CONSTANTS = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
 
 // Various helpers and building blocks
+let subWord = (word, mapping = S_BOX) => word.forEach((e, i) => word[i] = mapping[e]);
 let subBytes = (state, mapping = S_BOX) => state.forEach(row => subWord(row, mapping));
 let invSubBytes = state => subBytes(state, INV_S_BOX);
 let shiftRows = state => state.forEach(rotWord);
 let invShiftRows = state => state.forEach(rotWordRight);
 let rotWord = (temp, n = 1) => temp.push(...(temp.splice(0, n)));
 let rotWordRight = (word, n) => rotWord(word, 4 - n);
-let mul = (f, x) => f === 1 ? x : MUL[f][x];
 let invMixColumns = state => mixColumns(state, [14, 9, 13, 11]);
 let xorRow = (row, key) => row.forEach((_, i) => row[i] ^= key[i]);
-let subWord = (word, mapping = S_BOX) => word.forEach((e, i) => word[i] = mapping[e]);
 let xorArray = (array, key) => array.forEach((row, i) => xorRow(row, key[i]));
 let addRoundKey = (state, key) => xorArray(state, transpose(key));
 let transpose = array => array[0].map((_, column) => array.map(row => row[column]));
-let makeOutput = state => transpose(state).flatMap(x => x);
-let makeState = input => transpose(chunks(input));
 let chunks = key => [key.slice(0, 4), key.slice(4, 8), key.slice(8, 12), key.slice(12, 16)];
+let makeState = input => transpose(chunks(input));
+let makeOutput = state => transpose(state).flatMap(x => x);
+let mul = (f, x) => f === 1 ? x : MUL[f][x];
 
 // Polynomial multiplication modulo x^4 + 1, see §5.1.3
 function mixColumns(state, coefficients = [2, 1, 1, 3]) {
@@ -51,14 +51,15 @@ function mixColumns(state, coefficients = [2, 1, 1, 3]) {
 function expandKey(key) {
   let w = chunks(key);
 
-  for (let i = Nk; i < numColumns * (numRounds + 1); i++) {
+  let n = numColumns * (numRounds + 1);
+  for (let i = Nr; i < n; i++) {
     let temp = [...w[i - 1]];
-    if (i % Nk === 0) {
+    if (i % Nr === 0) {
       rotWord(temp);
       subWord(temp);
-      temp[0] ^= ROUND_CONSTANTS[Math.floor(i / Nk)];
+      temp[0] ^= ROUND_CONSTANTS[Math.floor(i / Nr)];
     }
-    w[i] = [...w[i - Nk]];
+    w[i] = [...w[i - Nr]];
     xorRow(w[i], temp);
   }
 
@@ -74,7 +75,7 @@ function cipher(input, w) {
     subBytes(state);
     shiftRows(state);
     mixColumns(state);
-    addRoundKey(state, w.slice(round * Nk, (round + 1) * Nk));
+    addRoundKey(state, w.slice(round * Nr, (round + 1) * Nr));
   }
 
   subBytes(state);
