@@ -251,18 +251,12 @@ function expandKey(key) {
     return x.map(x => x.toString(16).padStart(2, '0')).join('');
   }
 
-  console.log(hex(key));
   let keySchedule = [
     [...key.slice(0, 4)],
     [...key.slice(4, 8)],
     [...key.slice(8, 12)],
     [...key.slice(12, 16)],
   ];
-
-  for (let foo of keySchedule) {
-    console.log(foo.map(
-      x => x.toString(16).padStart(2, '0')).join(''))
-  }
 
   for (let i = Nk; i < numColumns * (numRounds + 1); i++) {
     let temp = [...keySchedule[i - 1]];
@@ -333,7 +327,13 @@ function cipher(input, w) {
   ];
 }
 
-function invCipher(state, w) {
+function invCipher(input, w) {
+  let state = [
+    [input[0], input[4], input[8], input[12]],
+    [input[1], input[5], input[9], input[13]],
+    [input[2], input[6], input[10], input[14]],
+    [input[3], input[7], input[11], input[15]],
+  ];
   addRoundKey(state, transpose(w.slice(40, 44)));
   for (let round = numRounds - 1; round > 0; round--) {
     invShiftRows(state);

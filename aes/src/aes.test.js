@@ -87,7 +87,7 @@ test('addRoundKey', () => {
 });
 
 test('expandKey', () => {
-  let key = fromHex('2b7e151628aed2a6abf7158809cf4f3c');
+  let key = fromHex('2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c');
 
   let roundKeys = expandKey(key);
 
@@ -108,12 +108,7 @@ test('cipher', () => {
 });
 
 test('invCipher', () => {
-  let input = [
-    [0x39, 0x02, 0xdc, 0x19],
-    [0x25, 0xdc, 0x11, 0x6a],
-    [0x84, 0x09, 0x85, 0x0b],
-    [0x1d, 0xfb, 0x97, 0x32],
-  ];
+  let input = fromHex('39 25 84 1d 02 dc 09 fb dc 11 85 97 19 6a 0b 32');
   let key = fromHex('2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c');
   let keySchedule = expandKey(key);
 
