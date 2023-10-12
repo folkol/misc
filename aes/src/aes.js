@@ -213,27 +213,7 @@ function addRoundKey(state, key) {
   });
 }
 
-function invAddRoundKey(state, key) {
-  state.forEach((row, i) => {
-    row.forEach((_, j) => {
-      state[i][j] ^= key[i][j];
-    });
-  });
-}
-
-const ROUND_CONSTANTS = [
-  0x00,
-  0x01,
-  0x02,
-  0x04,
-  0x08,
-  0x10,
-  0x20,
-  0x40,
-  0x80,
-  0x1b,
-  0x36,
-];
+const ROUND_CONSTANTS = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
 
 function rotWord(temp) {
   shiftRow(temp, 1);
@@ -247,10 +227,6 @@ function subWord(word) {
 }
 
 function expandKey(key) {
-  function hex(x) {
-    return x.map(x => x.toString(16).padStart(2, '0')).join('');
-  }
-
   let keySchedule = [
     [...key.slice(0, 4)],
     [...key.slice(4, 8)],
@@ -283,16 +259,41 @@ function transpose(x) {
     [x[0][1], x[1][1], x[2][1], x[3][1]],
     [x[0][2], x[1][2], x[2][2], x[3][2]],
     [x[0][3], x[1][3], x[2][3], x[3][3]],
-  ]
+  ];
 }
 
-function cipher(input, w) {
-  let state = [
+function makeState(input) {
+  return [
     [input[0], input[4], input[8], input[12]],
     [input[1], input[5], input[9], input[13]],
     [input[2], input[6], input[10], input[14]],
     [input[3], input[7], input[11], input[15]],
   ];
+}
+
+function makeOutput(state) {
+  return [
+    state[0][0],
+    state[1][0],
+    state[2][0],
+    state[3][0],
+    state[0][1],
+    state[1][1],
+    state[2][1],
+    state[3][1],
+    state[0][2],
+    state[1][2],
+    state[2][2],
+    state[3][2],
+    state[0][3],
+    state[1][3],
+    state[2][3],
+    state[3][3],
+  ];
+}
+
+function cipher(input, w) {
+  let state = makeState(input);
 
   addRoundKey(state, transpose(w.slice(0, 4)));
 
@@ -307,33 +308,12 @@ function cipher(input, w) {
   shiftRows(state);
   addRoundKey(state, transpose(w.slice(40, 44)));
 
-  return [
-    state[0][0],
-    state[1][0],
-    state[2][0],
-    state[3][0],
-    state[0][1],
-    state[1][1],
-    state[2][1],
-    state[3][1],
-    state[0][2],
-    state[1][2],
-    state[2][2],
-    state[3][2],
-    state[0][3],
-    state[1][3],
-    state[2][3],
-    state[3][3],
-  ];
+  return makeOutput(state);
 }
 
 function invCipher(input, w) {
-  let state = [
-    [input[0], input[4], input[8], input[12]],
-    [input[1], input[5], input[9], input[13]],
-    [input[2], input[6], input[10], input[14]],
-    [input[3], input[7], input[11], input[15]],
-  ];
+  let state = makeState(input);
+
   addRoundKey(state, transpose(w.slice(40, 44)));
   for (let round = numRounds - 1; round > 0; round--) {
     invShiftRows(state);
@@ -346,24 +326,7 @@ function invCipher(input, w) {
   invSubBytes(state);
   addRoundKey(state, transpose(w.slice(0, numColumns)));
 
-  return [
-    state[0][0],
-    state[1][0],
-    state[2][0],
-    state[3][0],
-    state[0][1],
-    state[1][1],
-    state[2][1],
-    state[3][1],
-    state[0][2],
-    state[1][2],
-    state[2][2],
-    state[3][2],
-    state[0][3],
-    state[1][3],
-    state[2][3],
-    state[3][3],
-  ];
+  return makeOutput(state);
 }
 
 module.exports = {
