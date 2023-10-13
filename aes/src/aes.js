@@ -31,6 +31,7 @@ let rotWordRight = (word, n) => rotWord(word, 4 - n);
 let invMixColumns = state => mixColumns(state, [14, 9, 13, 11]);
 let xorRow = (row, key) => row.forEach((_, i) => row[i] ^= key[i]);
 let xorArray = (array, key) => array.forEach((row, i) => xorRow(row, key[i]));
+let makeRoundKey = (w, round) => w.slice(round * numColumns, (round + 1) * (numColumns));
 let addRoundKey = (state, key) => xorArray(state, transpose(key));
 let transpose = array => array[0].map((_, column) => array.map(row => row[column]));
 let chunks = key => [key.slice(0, 4), key.slice(4, 8), key.slice(8, 12), key.slice(12, 16)];
@@ -71,36 +72,37 @@ function expandKey(key) {
 function cipher(input, w) {
   let state = makeState(input);
 
-  addRoundKey(state, w.slice(0, 4));
+  addRoundKey(state, makeRoundKey(w, 0));
 
   for (let round = 1; round < numRounds; round++) {
     subBytes(state);
     shiftRows(state);
     mixColumns(state);
-    addRoundKey(state, w.slice(round * Nr, (round + 1) * Nr));
+    addRoundKey(state, makeRoundKey(w, round));
   }
 
   subBytes(state);
   shiftRows(state);
-  addRoundKey(state, w.slice(40, 44));
+  addRoundKey(state, makeRoundKey(w, numRounds));
 
   return makeOutput(state);
 }
 
+
 function invCipher(input, w) {
   let state = makeState(input);
 
-  addRoundKey(state, w.slice(40, 44));
+  addRoundKey(state, makeRoundKey(w, numRounds));
   for (let round = numRounds - 1; round > 0; round--) {
     invShiftRows(state);
     invSubBytes(state);
-    addRoundKey(state, w.slice(round * numColumns, (round + 1) * (numColumns)));
+    addRoundKey(state, makeRoundKey(w, round));
     invMixColumns(state);
   }
 
   invShiftRows(state);
   invSubBytes(state);
-  addRoundKey(state, w.slice(0, numColumns));
+  addRoundKey(state, makeRoundKey(w, 0));
 
   return makeOutput(state);
 }
