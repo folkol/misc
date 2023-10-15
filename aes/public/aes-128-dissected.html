@@ -106,7 +106,7 @@
   <ul class='instructions'>
     <li>The plots show the internal state is for each step of AES-128.</li>
     <li>The left graph is a bitmap, first byte on first row and LSB in first column.</li>
-    <li>The right graph show byte values, first byte is to the left and all bits set (=255) means full bar height.
+    <li>The right graph show byte values, first byte is to the left.
     </li>
     <li>The internal steps of the algorithm is enumerated to the right.</li>
     <li>Progress through the algorithm with the 'Step-slide' (or arrow keys)</li>
@@ -141,8 +141,8 @@ let rotWord = (temp, n = 1) => temp.push(...(temp.splice(0, n)));
 let xorRow = (row, key) => row.forEach((_, i) => row[i] ^= key[i]);
 let xorArray = (array, key) => array.forEach((row, i) => xorRow(row, key[i]));
 let makeRoundKey = (words, round) => words.slice(round * numColumns, (round + 1) * (numColumns));
-let addRoundKey = (state, key) => xorArray(state, transpose(key));
-let transpose = array => array[0].map((_, column) => array.map(row => row[column]));
+let addRoundKey = (state, key) => xorArray(state, transposed(key));
+let transposed = array => array[0].map((_, column) => array.map(row => row[column]));
 let chunks = key => [key.slice(0, 4), key.slice(4, 8), key.slice(8, 12), key.slice(12, 16)];
 let fromHex = hex => [...hex.matchAll(/[\da-f]{2} ?/g)].map(byte => parseInt(byte, 16));
 let toHex = xs => xs.map(x => x.toString(16).padStart(2, '0')).join(' ');
@@ -176,39 +176,39 @@ function expandKey(key) {
 
 function cipher(input, w) {
   function snapShot(foo) {
-    state.snapshots.push(structuredClone(foo));
+    guiState.snapshots.push(structuredClone(foo));
   }
 
-  state.snapshots = [];
+  guiState.snapshots = [];
 
   let initial = chunks(input);
   snapShot(initial);
-  let foo = transpose(initial);
-  snapShot(foo);
-  addRoundKey(foo, makeRoundKey(w, 0));
-  snapShot(foo);
+  let state = transposed(initial);
+  snapShot(state);
+  addRoundKey(state, makeRoundKey(w, 0));
+  snapShot(state);
 
   for (let round = 1; round < numRounds; round++) {
-    subBytes(foo);
-    snapShot(foo);
-    shiftRows(foo);
-    snapShot(foo);
-    mixColumns(foo);
-    snapShot(foo);
-    addRoundKey(foo, makeRoundKey(w, round));
-    snapShot(foo);
+    subBytes(state);
+    snapShot(state);
+    shiftRows(state);
+    snapShot(state);
+    mixColumns(state);
+    snapShot(state);
+    addRoundKey(state, makeRoundKey(w, round));
+    snapShot(state);
   }
 
-  subBytes(foo);
-  snapShot(foo);
-  shiftRows(foo);
-  snapShot(foo);
-  addRoundKey(foo, makeRoundKey(w, numRounds));
-  snapShot(foo);
+  subBytes(state);
+  snapShot(state);
+  shiftRows(state);
+  snapShot(state);
+  addRoundKey(state, makeRoundKey(w, numRounds));
+  snapShot(state);
 
-  foo = transpose(foo);
-  snapShot(foo);
-  return foo.flat();
+  state = transposed(state);
+  snapShot(state);
+  return state.flat();
 }
 </script>
 
@@ -220,6 +220,13 @@ let cipherText = document.getElementById('cipherText');
 let slider = document.getElementById('slider');
 let plaintextInput = document.getElementById('plaintext');
 let keyInput = document.getElementById('keyInput');
+
+let guiState = {
+  snapshots: [],
+  current: 0,
+  plaintext: fromHex(plaintextInput.value),
+  key: fromHex(keyInput.value),
+};
 
 function generateBitmap() {
   for (let bit = 0; bit < 128; bit++) {
@@ -262,8 +269,9 @@ function generateSteps() {
 function updateBitmap(state) {
   state.flat().forEach((byte, j) => {
     for (let bit = 0; bit < 8; bit++) {
+      let isSet = byte & (1 << bit);
       let cell = document.getElementById(`bit_${j * 8 + bit}`);
-      cell.style.backgroundColor = byte & (1 << bit) && 'yellowgreen' || 'rgb(7, 13, 0)';
+      cell.style.backgroundColor = isSet && 'yellowgreen' || 'rgb(7, 13, 0)';
     }
   });
 }
@@ -278,27 +286,21 @@ function updateBarChart(state) {
 function updateSteps() {
   Array.prototype.forEach.call(steps.children, (child, index) => {
     child.className = '';
-    if (index === state.current) {
+    if (index === guiState.current) {
       child.classList.add('current');
-    } else if (index > state.current) {
+    } else if (index > guiState.current) {
       child.classList.add('faded');
     }
   });
 }
 
-let state = {
-  snapshots: [],
-  current: 0,
-  plaintext: fromHex(plaintextInput.value),
-  key: fromHex(keyInput.value),
-};
-
 function update() {
-  cipher(state.plaintext, expandKey(state.key));
-  cipherText.value = toHex(state.snapshots[state.current].flat());
+  cipher(guiState.plaintext, expandKey(guiState.key));
+  let currentState = guiState.snapshots[guiState.current];
+  cipherText.value = toHex(currentState.flat());
   updateSteps();
-  updateBitmap(state.snapshots[state.current]);
-  updateBarChart(state.snapshots[state.current]);
+  updateBitmap(currentState);
+  updateBarChart(currentState);
 }
 
 function validateInput(input) {
@@ -313,20 +315,20 @@ function validateInput(input) {
 }
 
 slider.addEventListener('input', e => {
-  state.current = parseInt(e.target.value);
+  guiState.current = parseInt(e.target.value);
   update();
 });
 
 plaintextInput.addEventListener('input', e => {
   if (validateInput(e.target)) {
-    state.plaintext = fromHex(e.target.value);
+    guiState.plaintext = fromHex(e.target.value);
     update();
   }
 });
 
 keyInput.addEventListener('input', e => {
   if (validateInput(e.target)) {
-    state.key = fromHex(e.target.value);
+    guiState.key = fromHex(e.target.value);
     update();
   }
 });
@@ -335,16 +337,15 @@ document.addEventListener('keydown', e => {
   if (document.activeElement.tagName.toLowerCase() === 'input') {
     return;
   }
-  let key = e.key;
-  if (key === ' ' || key === 'ArrowRight' || key === 'ArrowDown' || key === 'l' || key === 'j' || key === 'd' || key === 's') {
+  let k = e.key;
+  if (k === ' ' || k === 'ArrowRight' || k === 'ArrowDown' || k === 'l' || k === 'j' || k === 'd' || k === 's') {
     slider.value = parseInt(slider.value) + 1;
     slider.dispatchEvent(new Event('input'));
-    e.preventDefault();
-  } else if (key === 'ArrowLeft' || key === 'ArrowUp' || key === 'a' || key === 'k' || key === 'h' || key === 'w') {
+  } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'a' || k === 'k' || k === 'h' || k === 'w') {
     slider.value = parseInt(slider.value) - 1;
     slider.dispatchEvent(new Event('input'));
-    e.preventDefault();
   }
+  e.preventDefault();
 });
 
 generateSteps();
