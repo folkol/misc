@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
   <meta charset='UTF-8'>
-  <title>AES 128 Dissected</title>
+  <title>AES-128 Dissected</title>
   <style>
       #plots {
           display: flex;
@@ -10,18 +10,18 @@
       }
 
       label {
-          width: 100px;
-          display: inline-block;
           line-height: 150%;
           margin-top: 0.25rem;
+          display: flex;
+          flex-direction: column;
       }
 
-      h1, #steps, #controls, input, label {
+      h1, #steps, input, label {
           font-family: monospace;
       }
 
       .faded {
-          color: gray;
+          color: lightgray;
       }
 
       .current {
@@ -31,66 +31,77 @@
       #viz {
           display: flex;
           gap: 1rem;
-          align-items: start;
-          margin-top: 2rem;
           margin-bottom: 2rem;
       }
 
-      #bitmap {
+      .plot {
           border: 2px solid black;
-          grid-row: span 2;
           display: grid;
-          gap: 2px;
-          grid-template-columns: repeat(8, 3rem);
-          grid-template-rows: repeat(16, 3rem);
           background-color: rgb(7, 13, 0);
       }
 
-      #plot {
-          border: 2px solid black;
-          display: grid;
+      .plot > span {
+          background-color: yellowgreen;
+      }
+
+      #bitmap {
+          grid-row: span 2;
+          gap: 2px;
+          grid-template-columns: repeat(8, 3rem);
+          grid-template-rows: repeat(16, 3rem);
+      }
+
+      #barChart {
           gap: 2px;
           grid-template-columns: repeat(16, 2rem);
           grid-template-rows: 100%;
           align-items: end;
           justify-self: stretch;
-          background-color: rgb(7, 13, 0);
       }
 
-      #plot span {
-          background-color: yellowgreen;
-      }
-
-      #controls {
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-          justify-items: stretch;
-      }
-
-      #slider {
+      input {
           width: 30rem;
+          /*padding-left: 1rem;*/
+      }
+
+      aside {
+          font-style: italic;
+      }
+
+      input:invalid {
+          color: red;
       }
   </style>
 </head>
 <body>
-<h1>AES 128 Dissected</h1>
+<h1>AES-128 Dissected</h1>
 <div id='viz'>
   <div id='plots'>
-    <div id='bitmap'></div>
-    <div id='plot'></div>
+    <div id='bitmap' class='plot'></div>
+    <div id='barChart' class='plot'></div>
   </div>
   <ol id='steps'></ol>
 </div>
-<div id='controls'>
+<div>
   <label>Step-slider:<input id='slider' type='range' min='0' max='42' value='0'></label>
   <!--  <label>Plaintext:<input id='plaintext' value='32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34' size='47'></label>-->
   <!--  <label>Key: <input id='keyInput' value='2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c' size='47'></label>-->
   <!--  Expected Ciphertext: '39 25 84 1d 02 dc 09 fb dc 11 85 97 19 6a 0b 32'-->
-  <label>Plaintext:<input id='plaintext' value='00 00 00 00 00 00 00 ff ff 00 00 00 00 00 00 00' size='47'></label>
-  <label>Key:<input id='keyInput' value='00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00' size='47'></label>
+  <label>Plaintext:<input id='plaintext' value='00 00 00 00 00 00 00 ff ff 00 00 00 00 00 00 00' size='47'
+                          pattern='([a-z0-9]{2} ?){16}'></label>
+  <label>Key:<input id='keyInput' value='00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00' size='47'
+                    pattern='([a-z0-9]{2} ?){16}'></label>
   <label>Ciphertext:<input id='cipherText' value='???' disabled size='47'></label>
 </div>
+<aside>
+  <ul>
+    <li>The plots show the internal state is for each step of AES-128.</li>
+    <li>The left graph is a bitmap, first byte on first row and LSB in first column.</li>
+    <li>The right graph show byte values, first byte is to the left and all bits set (=255) means full bar height.</li>
+    <li>The internal steps of the algorithm is enumerated to the right.</li>
+    <li>Plaintext and Key are mutable — go nuts! :)</li>
+  </ul>
+</aside>
 </body>
 
 <script> // AES
@@ -124,7 +135,6 @@ let transpose = array => array[0].map((_, column) => array.map(row => row[column
 let chunks = key => [key.slice(0, 4), key.slice(4, 8), key.slice(8, 12), key.slice(12, 16)];
 let fromHex = hex => [...hex.matchAll(/[\da-f]{2} ?/g)].map(byte => parseInt(byte, 16));
 let toHex = xs => xs.map(x => x.toString(16).padStart(2, '0')).join(' ');
-let snapShot = state => states.push(structuredClone(state));
 
 // Polynomial multiplication modulo x^4 + 1, see §5.1.3
 function mixColumns(state, coefficients = [2, 1, 1, 3]) {
@@ -153,44 +163,68 @@ function expandKey(key) {
   return words;
 }
 
-
 function cipher(input, w) {
-  states = [];
-  let initial = chunks(input);
-  snapShot(initial);
-  let state = transpose(initial);
-  snapShot(state);
-  addRoundKey(state, makeRoundKey(w, 0));
-  snapShot(state);
-
-  for (let round = 1; round < numRounds; round++) {
-    subBytes(state);
-    snapShot(state);
-    shiftRows(state);
-    snapShot(state);
-    mixColumns(state);
-    snapShot(state);
-    addRoundKey(state, makeRoundKey(w, round));
-    snapShot(state);
+  function snapShot(foo) {
+    state.snapshots.push(structuredClone(foo));
   }
 
-  subBytes(state);
-  snapShot(state);
-  shiftRows(state);
-  snapShot(state);
-  addRoundKey(state, makeRoundKey(w, numRounds));
-  snapShot(state);
+  state.snapshots = [];
 
-  state = transpose(state);
-  snapShot(state);
-  return state.flatMap(x => x);
+  let initial = chunks(input);
+  snapShot(initial);
+  let foo = transpose(initial);
+  snapShot(foo);
+  addRoundKey(foo, makeRoundKey(w, 0));
+  snapShot(foo);
+
+  for (let round = 1; round < numRounds; round++) {
+    subBytes(foo);
+    snapShot(foo);
+    shiftRows(foo);
+    snapShot(foo);
+    mixColumns(foo);
+    snapShot(foo);
+    addRoundKey(foo, makeRoundKey(w, round));
+    snapShot(foo);
+  }
+
+  subBytes(foo);
+  snapShot(foo);
+  shiftRows(foo);
+  snapShot(foo);
+  addRoundKey(foo, makeRoundKey(w, numRounds));
+  snapShot(foo);
+
+  foo = transpose(foo);
+  snapShot(foo);
+  return foo.flat();
 }
 </script>
 
 <script> //GUI
 let bitmap = document.getElementById('bitmap');
+let barChart = document.getElementById('barChart');
 let steps = document.getElementById('steps');
-let plot = document.getElementById('plot');
+let cipherText = document.getElementById('cipherText');
+let slider = document.getElementById('slider');
+let plaintextInput = document.getElementById('plaintext');
+let keyInput = document.getElementById('keyInput');
+
+function generateBitmap() {
+  for (let bit = 0; bit < 128; bit++) {
+    let bitDiv = document.createElement('span');
+    bitDiv.setAttribute('id', `bit_${bit}`);
+    bitmap.appendChild(bitDiv);
+  }
+}
+
+function generateBarChart() {
+  for (let bit = 0; bit < 16; bit++) {
+    let byteDiv = document.createElement('span');
+    byteDiv.setAttribute('id', `bar_${bit}`);
+    barChart.appendChild(byteDiv);
+  }
+}
 
 function generateSteps() {
   let addStep = text => {
@@ -214,35 +248,8 @@ function generateSteps() {
   addStep('result');
 }
 
-function generateBitmap() {
-  for (let bit = 0; bit < 128; bit++) {
-    let bitDiv = document.createElement('span');
-    bitDiv.setAttribute('id', `bit_${bit}`);
-    bitmap.appendChild(bitDiv);
-  }
-}
-
-function generateBars() {
-  for (let bit = 0; bit < 16; bit++) {
-    let byteDiv = document.createElement('span');
-    byteDiv.setAttribute('id', `bar_${bit}`);
-    plot.appendChild(byteDiv);
-  }
-}
-
-function updateList() {
-  Array.prototype.forEach.call(steps.children, (child, index) => {
-    child.className = '';
-    if (index === currentState) {
-      child.classList.add('current');
-    } else if (index > currentState) {
-      child.classList.add('faded');
-    }
-  });
-}
-
 function updateBitmap(state) {
-  state.flatMap(row => row).forEach((byte, j) => {
+  state.flat().forEach((byte, j) => {
     for (let bit = 0; bit < 8; bit++) {
       let cell = document.getElementById(`bit_${j * 8 + bit}`);
       cell.style.backgroundColor = byte & (1 << bit) && 'yellowgreen' || 'rgb(7, 13, 0)';
@@ -250,47 +257,72 @@ function updateBitmap(state) {
   });
 }
 
-function updatePlot(state) {
+function updateBarChart(state) {
   state.flat().forEach((byte, j) => {
     let bar = document.getElementById(`bar_${j}`);
     bar.style.height = `${100 * byte / 255}%`;
   });
 }
 
+function updateSteps() {
+  Array.prototype.forEach.call(steps.children, (child, index) => {
+    child.className = '';
+    if (index === state.current) {
+      child.classList.add('current');
+    } else if (index > state.current) {
+      child.classList.add('faded');
+    }
+  });
+}
+
+let state = {
+  snapshots: [],
+  current: 0,
+  plaintext: fromHex(plaintextInput.value),
+  key: fromHex(keyInput.value),
+};
+
 function update() {
-  cipher(input, expandKey(key));
-  cipherText.value = toHex(states[currentState].flatMap(x => x));
-  updateList();
-  updateBitmap(states[currentState]);
-  updatePlot(states[currentState]);
+  cipher(state.plaintext, expandKey(state.key));
+  cipherText.value = toHex(state.snapshots[state.current].flat());
+  updateSteps();
+  updateBitmap(state.snapshots[state.current]);
+  updateBarChart(state.snapshots[state.current]);
+}
+
+function validateInput(input) {
+  let matchesPattern = !input.validity.patternMismatch;
+  if (matchesPattern) {
+    input.setCustomValidity('expected 16 byte hex string (00 88 aa ff...)');
+  } else {
+    input.setCustomValidity('');
+  }
+  return matchesPattern;
 }
 
 slider.addEventListener('input', e => {
-  currentState = parseInt(e.target.value);
+  state.current = parseInt(e.target.value);
   update();
 });
 
-plaintext.addEventListener('input', e => {
-  input = fromHex(e.target.value);
-  update();
+plaintextInput.addEventListener('input', e => {
+  if (validateInput(e.target)) {
+    state.plaintext = fromHex(e.target.value);
+    update();
+  }
 });
 
 keyInput.addEventListener('input', e => {
-  key = fromHex(e.target.value);
-  update();
+  if (validateInput(e.target)) {
+    state.key = fromHex(e.target.value);
+    update();
+  }
 });
-
-let states = [];
-let input = fromHex(plaintext.value);
-let key = fromHex(keyInput.value);
-let currentState = 0;
-cipherText.value = toHex(input);
 
 generateSteps();
 generateBitmap();
-generateBars();
+generateBarChart();
 
-cipher(input, expandKey(key));
 update();
 </script>
 </html>
