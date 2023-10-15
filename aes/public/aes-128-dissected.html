@@ -319,6 +319,29 @@ keyInput.addEventListener('input', e => {
   }
 });
 
+let pending = null;
+document.addEventListener('keydown', e => {
+  console.log(slider.value, e);
+  let key = e.key;
+  if (key === ' ' || key === 'ArrowRight' || key === 'ArrowDown' || key === 'l' || key === 'j' || key === 'd' || key === 's') {
+    slider.value = parseInt(slider.value) + 1;
+    slider.dispatchEvent(new Event('input'));
+    e.preventDefault();
+  } else if (key === 'ArrowLeft' || key === 'ArrowUp' || key === 'a' || key === 'k' || key === 'h' || key === 'w') {
+    slider.value = parseInt(slider.value) - 1;
+    slider.dispatchEvent(new Event('input'));
+    e.preventDefault();
+  } else if(key.match(/\d+/)) {
+    let value = pending !== null ? pending + key : key;
+    console.log(key, pending, value);
+    slider.value = parseInt(value) - 1;
+    slider.dispatchEvent(new Event('input'));
+    pending = key;
+    setTimeout(() => pending = null, 500);
+    e.preventDefault();
+  }
+});
+
 generateSteps();
 generateBitmap();
 generateBarChart();
