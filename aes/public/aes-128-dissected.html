@@ -106,11 +106,10 @@
   <ul class='instructions'>
     <li>The plots show the internal state is for each step of AES-128.</li>
     <li>The left graph is a bitmap, first byte on first row and LSB in first column.</li>
-    <li>The right graph show byte values, first byte is to the left.
-    </li>
+    <li>The right graph show byte values, first byte is to the left.</li>
     <li>The internal steps of the algorithm is enumerated to the right.</li>
     <li>Progress through the algorithm with the 'Step-slide' (or arrow keys)</li>
-    <li>Plaintext and Key are mutable — go nuts! :)</li>
+    <li>Plaintext and Key are mutable — poke around! :)</li>
   </ul>
 </div>
 </body>
@@ -334,6 +333,7 @@ keyInput.addEventListener('input', e => {
 });
 
 document.addEventListener('keydown', e => {
+  console.log(e);
   if (document.activeElement.tagName.toLowerCase() === 'input') {
     return;
   }
@@ -341,11 +341,12 @@ document.addEventListener('keydown', e => {
   if (k === ' ' || k === 'ArrowRight' || k === 'ArrowDown' || k === 'l' || k === 'j' || k === 'd' || k === 's') {
     slider.value = parseInt(slider.value) + 1;
     slider.dispatchEvent(new Event('input'));
+    e.preventDefault();
   } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'a' || k === 'k' || k === 'h' || k === 'w') {
     slider.value = parseInt(slider.value) - 1;
     slider.dispatchEvent(new Event('input'));
+    e.preventDefault();
   }
-  e.preventDefault();
 });
 
 generateSteps();
