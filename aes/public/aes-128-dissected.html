@@ -337,15 +337,15 @@ document.addEventListener('keydown', e => {
   if (document.activeElement.tagName.toLowerCase() === 'input') {
     return;
   }
-  if(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+  if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
     return;
   }
   let k = e.key;
-  if (k === ' ' || k === 'ArrowRight' || k === 'ArrowDown' || k === 'l' || k === 'j' || k === 'd' || k === 's') {
+  if ([' ', 'ArrowRight', 'ArrowDown', 'l', 'j', 'd', 's'].includes(k)) {
     slider.value = parseInt(slider.value) + 1;
     slider.dispatchEvent(new Event('input'));
     e.preventDefault();
-  } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'a' || k === 'k' || k === 'h' || k === 'w') {
+  } else if (['ArrowLeft', 'ArrowUp', 'a', 'k', 'h', 'w'].includes(k)) {
     slider.value = parseInt(slider.value) - 1;
     slider.dispatchEvent(new Event('input'));
     e.preventDefault();
