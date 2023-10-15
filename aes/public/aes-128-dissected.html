@@ -60,7 +60,7 @@
       }
 
       input {
-          width: 30rem;
+          /*width: 30rem;*/
           /*padding-left: 1rem;*/
       }
 
@@ -70,6 +70,10 @@
 
       input:invalid {
           color: red;
+      }
+
+      #controls {
+          width: 30rem;
       }
   </style>
 </head>
@@ -82,7 +86,7 @@
   </div>
   <ol id='steps'></ol>
 </div>
-<div>
+<div id='controls'>
   <label>Step-slider:<input id='slider' type='range' min='0' max='42' value='0'></label>
   <!--  <label>Plaintext:<input id='plaintext' value='32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34' size='47'></label>-->
   <!--  <label>Key: <input id='keyInput' value='2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c' size='47'></label>-->
@@ -293,9 +297,9 @@ function update() {
 function validateInput(input) {
   let matchesPattern = !input.validity.patternMismatch;
   if (matchesPattern) {
-    input.setCustomValidity('expected 16 byte hex string (00 88 aa ff...)');
-  } else {
     input.setCustomValidity('');
+  } else {
+    input.setCustomValidity('expected 16 byte hex string (00 88 aa ff...)');
   }
   return matchesPattern;
 }
@@ -319,9 +323,10 @@ keyInput.addEventListener('input', e => {
   }
 });
 
-let pending = null;
-document.addEventListener('keydown', e => {
-  console.log(slider.value, e);
+document.getElementsByTagName('body')[0].addEventListener('keydown', e => {
+  if (document.activeElement.tagName.toLowerCase() === 'input') {
+    return;
+  }
   let key = e.key;
   if (key === ' ' || key === 'ArrowRight' || key === 'ArrowDown' || key === 'l' || key === 'j' || key === 'd' || key === 's') {
     slider.value = parseInt(slider.value) + 1;
@@ -330,14 +335,6 @@ document.addEventListener('keydown', e => {
   } else if (key === 'ArrowLeft' || key === 'ArrowUp' || key === 'a' || key === 'k' || key === 'h' || key === 'w') {
     slider.value = parseInt(slider.value) - 1;
     slider.dispatchEvent(new Event('input'));
-    e.preventDefault();
-  } else if(key.match(/\d+/)) {
-    let value = pending !== null ? pending + key : key;
-    console.log(key, pending, value);
-    slider.value = parseInt(value) - 1;
-    slider.dispatchEvent(new Event('input'));
-    pending = key;
-    setTimeout(() => pending = null, 500);
     e.preventDefault();
   }
 });
