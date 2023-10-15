@@ -42,6 +42,7 @@
           gap: 2px;
           grid-template-columns: repeat(8, 3rem);
           grid-template-rows: repeat(16, 3rem);
+          background-color: black;
       }
 
       #plot {
@@ -56,7 +57,7 @@
       }
 
       #plot span {
-          background-color: greenyellow;
+          background-color: yellowgreen;
       }
 
       #controls {
@@ -83,10 +84,7 @@
     <div id='plot'></div>
   </div>
 </div>
-<div id='controls'>
-  <h2>Step: <span id='step'>0</span></h2>
-  <input id='slider' type='range' min='0' max='42' value='0'>
-</div>
+<input id='slider' type='range' min='0' max='42' value='0'>
 </body>
 <script>
   const numColumns = 4;
@@ -249,7 +247,6 @@
   function update() {
     cipher(input, expandKey(key));
     cipherText.value = toHex(states[currentState].state.flatMap(x => x));
-    step.innerText = currentState;
     updateList();
     updateBitmap(states[currentState]);
     updatePlot(states[currentState]);
