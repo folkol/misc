@@ -98,9 +98,9 @@
     <!--  <label>Key: <input id='keyInput' value='2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c' size='47'></label>-->
     <!--  Expected Ciphertext: '39 25 84 1d 02 dc 09 fb dc 11 85 97 19 6a 0b 32'-->
     <label>Plaintext:<input id='plaintext' value='00 00 00 00 00 00 00 ff ff 00 00 00 00 00 00 00' size='47'
-                            pattern='([a-z0-9]{2} ?){16}'></label>
+                            pattern='([a-f0-9]{2} ?){16}'></label>
     <label>Key:<input id='keyInput' value='00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00' size='47'
-                      pattern='([a-z0-9]{2} ?){16}'></label>
+                      pattern='([a-f0-9]{2} ?){16}'></label>
     <label>Ciphertext:<input id='cipherText' value='???' disabled size='47'></label>
   </div>
   <ul class='instructions'>
@@ -335,6 +335,9 @@ keyInput.addEventListener('input', e => {
 document.addEventListener('keydown', e => {
   console.log(e);
   if (document.activeElement.tagName.toLowerCase() === 'input') {
+    return;
+  }
+  if(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
     return;
   }
   let k = e.key;
