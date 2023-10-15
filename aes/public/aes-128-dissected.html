@@ -299,7 +299,8 @@ function validateInput(input) {
   if (matchesPattern) {
     input.setCustomValidity('');
   } else {
-    input.setCustomValidity('expected 16 byte hex string (00 88 aa ff...)');
+    input.setCustomValidity('Expected 16 byte hex string (00 88 aa ff...)');
+    input.reportValidity();
   }
   return matchesPattern;
 }
@@ -323,7 +324,7 @@ keyInput.addEventListener('input', e => {
   }
 });
 
-document.getElementsByTagName('body')[0].addEventListener('keydown', e => {
+document.addEventListener('keydown', e => {
   if (document.activeElement.tagName.toLowerCase() === 'input') {
     return;
   }
