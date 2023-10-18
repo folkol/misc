@@ -44,7 +44,7 @@ mod test {
         let a = "elegant man";
         let b = "a gentleman";
         debug_assert!(crate::anagram_sort(a, b));
-        debug_assert!(crate::anagram_array(a, b, 11));
+        debug_assert!(crate::anagram_array(a, b, 128));
         debug_assert!(crate::anagram_map(a, b));
     }
 
@@ -53,7 +53,7 @@ mod test {
         let a = "elegant man";
         let b = "muppet";
         debug_assert!(!crate::anagram_sort(a, b));
-        debug_assert!(!crate::anagram_array(a, b, 11));
+        debug_assert!(!crate::anagram_array(a, b, 128));
         debug_assert!(!crate::anagram_map(a, b));
     }
 }
