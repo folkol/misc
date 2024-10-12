@@ -1,10 +1,10 @@
-# fly.toml app configuration file generated for backend-lively-dawn-8107 on 2024-10-12T22:02:17+02:00
+# fly.toml app configuration file generated for backend-bold-forest-9507 on 2024-10-12T23:51:17+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'backend-lively-dawn-8107'
-primary_region = 'arn'
+app = 'backend-bold-forest-9507'
+primary_region = 'fra'
 
 [build]
 
