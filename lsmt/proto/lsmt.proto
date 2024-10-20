@@ -1,0 +1,10 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package log_service;
+service LogService {
+  rpc AddRecord (LogRecord) returns (google.protobuf.Empty);
+}
+message LogRecord {
+  bytes key = 1;
+  bytes value = 2;
+}
