@@ -4,7 +4,9 @@ const nextConfig: NextConfig = {
     reactStrictMode: true,
     webpack(config) {
         config.module.rules.push({
-            test: /\.svg$/, issuer: {and: [/\.tsx$/],}, use: ['@svgr/webpack'],
+            test: /\.svg$/,
+            issuer: {and: [/\.tsx$/]},
+            use: ['@svgr/webpack'],
         });
         return config;
     },
