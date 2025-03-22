@@ -1,113 +1,271 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import MagnifyingGlass from '../../public/magnifying_glass.svg';
+import GitHubLogo from '../../public/logo.svg';
+import GitHubLogoLarge from '../../public/logo_large.svg';
+import Hamburger from '../../public/hamburger.svg';
+import Plus from '../../public/plus.svg';
+import DropDown from '../../public/dropdown.svg';
+import CoPilot from '../../public/copilot.svg';
+import Issues from '../../public/issues.svg';
+import PullRequests from '../../public/pullrequests.svg';
+import Notifications from '../../public/notifications.svg';
+import Overview from '../../public/overview.svg';
+import Repositories from '../../public/repositories.svg';
+import Projects from '../../public/projects.svg';
+import Packages from '../../public/packages.svg';
+import Stars from '../../public/stars.svg';
+import Followers from '../../public/followers.svg';
+import Location from '../../public/location.svg';
+import Link from '../../public/link.svg';
+import Commit from '../../public/commit.svg';
+import Flame from '../../public/flame.svg';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+function SidePanel() {
+    return <div className="border-1 border-gray-300 p-2 rounded"><Hamburger/></div>;
+}
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+function OmniSearch() {
+    return <div className="border-1 border-gray-300 p-1 rounded flex items-center">
+        <MagnifyingGlass/>
+        <input type="text" placeholder=" Type / to search"/>
+    </div>;
+}
+
+function User() {
+    return <div className="bg-white w-8 h-8 rounded-full border-1 border-gray-300">
+        <img src="https://avatars.githubusercontent.com/u/1186602?v=4" alt="" height="32" width="32"/>
+    </div>;
+}
+
+function CreateStuff() {
+    return <div className="flex justify-between space-x-2 items-center">
+        <Plus/>
+        <DropDown/>
+    </div>
+}
+
+function CoPilotCluster() {
+    return <div className="flex justify-between space-x-1 items-center border-1 border-gray-300 p-2 rounded">
+        <CoPilot/>
+        <DropDown/>
+    </div>
+}
+
+function Separator() {
+    return <div className="w-px bg-gray-300 h-full">&nbsp;</div>
+}
+
+function AppHeaderGlobal() {
+    let menuItems = [
+        <CreateStuff/>,
+        <Issues/>,
+        <PullRequests/>,
+        <Notifications/>,
+    ];
+    return <div className="flex justify-between items-center p-4 pb-2">
+        <div className="flex items-center space-x-4">
+            <SidePanel/>
+            <GitHubLogoLarge/>
+            <div className="text-sm font-bold">folkol</div>
+        </div>
+        <div className="flex items-center space-x-2 text-gray-500">
+            <OmniSearch/>
+            <CoPilotCluster/>
+            <Separator/>
+            {menuItems.map(item =>
+                <span className="border-1 border-gray-300 p-2 rounded">{item}</span>
+            )}
+            <User/>
+        </div>
+    </div>;
+}
+
+function AppHeaderLocal() {
+    let menuItems = [
+        ['Overview', <Overview/>],
+        ['Repositories', <Repositories/>, 207],
+        ['Projects', <Projects/>],
+        ['Packages', <Packages/>],
+        ['Stars', <Stars/>, 21],
+    ] as const;
+    return <div className="pl-4 border-b-1 border-gray-300">
+        <ul className="flex space-x-4">
+            {menuItems.map(([name, icon, number], i) => <li
+                className="flex items-center space-x-2 border-red-300 first:border-b-2 p-2">
+                <span className="text-gray-500">{icon}</span>
+                <span>{name}</span>
+                {number && <span className="ml-1 bg-gray-200 px-2 rounded-2xl text-sm">{number}</span>}
+            </li>)
+            }
+        </ul>
+    </div>;
+}
+
+function makeBadge(item: string) {
+    return <img width="64" height="64" src={item} alt=""/>;
+}
+
+function Achievements() {
+    let achievementBadges = [
+        "https://github.githubassets.com/assets/pull-shark-default-498c279a747d.png",
+        "https://github.githubassets.com/assets/quickdraw-default-39c6aec8ff89.png",
+        "https://github.githubassets.com/assets/pair-extraordinaire-default-579438a20e01.png",
+        "https://github.githubassets.com/assets/arctic-code-vault-contributor-default-df8d74122a06.png",
+    ];
+    return <div className="border-t-1 border-gray-200 pt-4">
+        <div className="font-bold text-base">Achievements</div>
+        <div className="flex flex-wrap">
+            {achievementBadges.map(makeBadge)}
+        </div>
+    </div>;
+}
+
+function Profile() {
+    return <div className="flex flex-col space-y-2 text-gray-700 mb-4 mt-4">
+        <div className="bg-white rounded-full border-1 border-gray-300">
+            <img width="100%" alt="" src="https://avatars.githubusercontent.com/u/1186602?v=4"/>
+        </div>
+        <p className="mt-4 mb-0 text-2xl font-bold">Matte</p>
+        <p className="mb-3 text-xl text-gray-500">folkol</p>
+        <p>This GitHub account is mainly for educational and/or recreational hacks of mine.</p>
+        <button type="button"
+                className="w-full bg-gray-100 border border-gray-300 rounded p-1 mt-2">
+            Edit profile
+        </button>
+        <div className="flex items-center">
+            <Followers className="mr-1"/>
+            <span><span className="font-bold">12</span> followers · <span
+                className="font-bold">11</span> following</span></div>
+        <div className="flex items-center text-sm"><Location/><span className="ml-2">Stockholm</span></div>
+        <div className="flex items-center text-sm"><Link/><span className="ml-2">https://folkol.com</span></div>
+    </div>;
+}
+
+function makeLang(lang: string) {
+    let backgroundColor = lang === 'Rust' ? '#dea584' : '#f1e05a';
+    return <span className="flex items-center gap-2">
+        <div style={{backgroundColor}} className="border rounded-full w-3 h-3 border-gray-500 mix-blend-multiply"/>
+        {lang}
+    </span>
+}
+
+function makeRepoCard([name, desc, lang, n]: string[]) {
+    return <div className="border rounded border-gray-300 p-4 w-full text-gray-500 text-sm flex flex-col gap-2">
+        <div className="flex gap-2">
+            <Commit/>
+            <span className="text-blue-500 font-bold text-sm">{name}</span>
+            <span className="border rounded-2xl px-2 border-gray-300">Public</span>
+        </div>
+        <div className="text-gray-500 text-xs">{desc}</div>
+        <div className="flex items-center gap-2">
+            <div>{makeLang(lang)}</div>
+            <div className="flex items-center"><Stars/>
+                <div>{n}</div>
+            </div>
+        </div>
+    </div>
+}
+
+function Pinned() {
+    let repos = [
+        ['futils', 'Various utility programs', 'Rust', '1'],
+        ['criterion.js', 'Partial JavaScript-port of Criterion.rs', 'JavaScript', '1'],
+    ];
+    return <div>
+        <p>Pinned</p>
+        <div className="flex gap-4">{repos.map(makeRepoCard)}</div>
+    </div>;
+}
+
+function ContributionCalendar() {
+    return <div className="border">???</div>;
+}
+
+function ContributionActivity() {
+    let years = Array.from({length: 15}, (_, x) => 2025 - x);
+    return <div className="w-full grid grid-cols-[5fr_1fr] gap-4 p-4">
+        <div>
+            <h2 className="py-6">Contribution activity</h2>
+            <div className="border-b-1 border-gray-300 h-3 text-sm">
+                <span className="bg-white mb-[-1] p-2 pr-3">March <span className="text-gray-500">2025</span></span>
+            </div>
+            <div className="ml-6">
+                <div className="p-6 border-l-2 border-gray-300 flex gap-2 items-center">
+                    <div
+                        className="ml-[-41px] border-white border-2 bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full">
+                        <Commit/></div>
+                    <p>Created 12 commits in 3 repositories</p>
+                </div>
+            </div>
+            <div className="ml-6">
+                <div className="p-6 border-l-2 border-gray-300 flex gap-2 items-center">
+                    <div
+                        className="ml-[-41px] border-white border-2 bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full">
+                        <Flame/></div>
+                    <p>Created a pull request in <span className="underline">folkol/tutorials</span> that received 1
+                        comment
+                    </p>
+                </div>
+            </div>
+            <div className="ml-6">
+                <div className="p-6 border-l-2 border-gray-300 flex gap-2 items-center">
+                    <div
+                        className="ml-[-41px] border-white border-2 bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full">
+                        <PullRequests/></div>
+                    <p>Opened 2 other pull requests in 2 repositories</p>
+                </div>
+            </div>
+            <button className="w-full border border-gray-300 rounded p-1 mt-2 text-xs p-2 font-bold text-blue-500"
+                    type="button">Show more
+                activity
+            </button>
+        </div>
+        <div>
+            <ul>
+                {years.map((year) => <li className="first:bg-blue-500 first:text-white p-2 rounded text-gray-500 text-sm mb-1 not-first:hover:bg-gray-100">{year}</li>)}
+            </ul>
+        </div>
+    </div>;
+}
+
+function Main() {
+    return <div className="flex-grow flex justify-center">
+        <div className="w-full max-w-[1280px] grid grid-cols-[1fr_3fr] gap-4 p-4">
+            <div>
+                <Profile/>
+                <Achievements/>
+            </div>
+            <div className="flex flex-col gap-4">
+                <Pinned/>
+                <ContributionCalendar/>
+                <ContributionActivity/>
+            </div>
+        </div>
+    </div>;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    let footerItems = [
+        '© 2025 GitHub, Inc.',
+        'Terms',
+        'Privacy',
+        'Security',
+        'Status',
+        'Docs',
+        'Contact',
+        'Manage cookies',
+        'Do not share my personal information',
+    ]
+    return (
+        <div className="flex flex-col h-full">
+            <header className="bg-gray-100">
+                <AppHeaderGlobal/>
+                <AppHeaderLocal/>
+            </header>
+            <Main/>
+            <footer className="flex justify-center items-center space-x-3 text-sm pt-8 pb-6 text-gray-500">
+                <GitHubLogo width="24" height="24"/>
+                {footerItems.map(item => <span>{item}</span>)}
+            </footer>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }

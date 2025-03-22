@@ -1,8 +1,13 @@
-import type { NextConfig } from "next";
+import type {NextConfig} from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactStrictMode: true,
+    reactStrictMode: true,
+    webpack(config) {
+        config.module.rules.push({
+            test: /\.svg$/, issuer: {and: [/\.tsx$/],}, use: ['@svgr/webpack'],
+        });
+        return config;
+    },
 };
 
 export default nextConfig;
