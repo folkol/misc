@@ -36,14 +36,14 @@ export function CoPilotCluster() {
     return <div className="flex justify-between space-x-1 items-center border-1 border-gray-300 p-2 rounded">
         <CoPilot/>
         <DropDown/>
-    </div>
+    </div>;
 }
 
 export function CreateCluster() {
     return <div className="flex justify-between space-x-2 items-center">
         <Plus/>
         <DropDown/>
-    </div>
+    </div>;
 }
 
 export function Avatar() {
@@ -125,10 +125,14 @@ export function Profile() {
 
 function makeLang(lang: string) {
     let backgroundColor = lang === 'Rust' ? '#dea584' : '#f1e05a';
-    return <span className="flex items-center gap-2">
-        <div style={{backgroundColor}} className="border rounded-full w-3 h-3 border-gray-500 mix-blend-multiply"/>
-        {lang}
-    </span>
+    return <div>
+        <span className="flex items-center gap-2">
+            <div style={{backgroundColor}} className="rounded-full w-3 h-3">
+                <div className="border-[0.5px] rounded-full w-3 h-3 border-gray-300 mix-blend-multiply"/>
+            </div>
+            {lang}
+        </span>
+    </div>;
 }
 
 function makeRepoCard([name, desc, lang, n]: string[]) {
@@ -224,10 +228,6 @@ export function Footer() {
     </footer>;
 }
 
-function makeBadge(item: string) {
-    return <img width="64" height="64" src={item} alt=""/>;
-}
-
 export function Achievements() {
     let achievementBadges = [
         "https://github.githubassets.com/assets/pull-shark-default-498c279a747d.png",
@@ -238,7 +238,7 @@ export function Achievements() {
     return <div className="border-t-1 border-gray-200 pt-4">
         <div className="font-bold text-base">Achievements</div>
         <div className="flex flex-wrap">
-            {achievementBadges.map(makeBadge)}
+            {achievementBadges.map(item => <img width="64" height="64" src={item} alt=""/>)}
         </div>
     </div>;
 }

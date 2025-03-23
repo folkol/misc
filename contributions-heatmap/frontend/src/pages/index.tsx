@@ -1,22 +1,56 @@
 import Link from 'next/link';
 
-const knownUsers = [
-    'folkol'
-];
+import {
+    Achievements,
+    AppHeaderGlobal,
+    AppHeaderLocal,
+    ContributionActivity,
+    Footer,
+    Pinned,
+    Profile,
+    History
+} from "@/components/GitHub";
 
-function makeLink(user: string) {
-    console.log('user', user);
-    let url = `/users/${user}`;
-    return <li><Link className="text-blue-500 underline" href={url}>{url}</Link></li>;
+function ContributionCalendar() {
+    return <div className="border-2 rounded flex justify-center items-center p-10 text-9xl">???</div>;
 }
 
-const HomePage = () => {
+function Main() {
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-4">Known Users</h1>
-            <ul className="list-disc pl-5">{knownUsers.map(makeLink)}</ul>
+        <div className="flex-grow flex justify-center">
+            <div className="w-full max-w-[1280px] grid grid-cols-[1fr_3fr] gap-4 p-4">
+                <div>
+                    <Profile/>
+                    <Achievements/>
+                </div>
+                <div className="flex flex-col gap-4">
+                    <Pinned/>
+                    <div className="w-full grid grid-cols-[5fr_1fr] gap-4 mt-6">
+                        <div>
+                            <ContributionCalendar/>
+                            <ContributionActivity/>
+                        </div>
+                        <History/>
+                    </div>
+                </div>
+            </div>
         </div>
     );
-};
+}
 
-export default HomePage;
+function Header() {
+    return (
+        <header className="bg-gray-100">
+            <AppHeaderGlobal/>
+            <AppHeaderLocal/>
+        </header>
+    );
+}
+
+export default function UserPage() {
+    return <div className="flex flex-col h-full">
+        <Header/>
+        <Main/>
+        <Footer/>
+    </div>;
+}
